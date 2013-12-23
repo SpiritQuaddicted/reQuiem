@@ -1,0 +1,523 @@
+
+Version history:
+""""""""""""""""
+
+0.95-b2: 2011-06-05
+  - fixed issue where running with +map wouldn't update screen until fully loaded
+  - fixed bug that caused unnecessary model loading, eventually filling the cache
+  - demo rewind: fixed issue where certain effects would remain after rewinding 
+     (eg. lightning bolts, pain face, particles, dynamic lights)
+  - interpolation now works properly when rewinding a demo
+  - cl_demospeed now works when host_framerate is non-zero
+  - interpolation no longer deforms SNG when firing stops
+  - replaced bigfont.lmp with menufont.lmp (padded to 256x256)
+      - now loads 24-bit texture gfx/mcharset.xxx if present
+  - fixed red fringe on multiplayer menu player graphic
+  - ctrl+shift+<key> combos once again work in console
+  - (internal): moved console-specific code from keys.c to console.c
+  - (internal): moved some code from sbar.c: stats-printing routines to gl_screen.c; 
+	loading/drawing of large numbers to gl_draw.c
+  - win32: fullscreen defaults to 32-bit color (fixes ATI garbage screen bug)
+  - r_showbboxes now works in coop demos
+  - when changing gamedir, cfg files are now exec'd *before* reloading wads & lmps
+      (so cvars related to images & files are current)
+  - Hexen II: 
+      - now generates charset for auto-complete
+      - fixed funny colored fringe around some alpha textures
+      - fixed alignment issue in Customize Controls menus
+      - fixed particle texture; fixed scr_printstats font spacing
+      - fixed "quivering" model problem when playing demos
+	  - fixed numbers on extended status bar
+	  - fixed scaling of common alias model skins (skin100 & skin101)
+  - if player texture was downsized (due to gl_playermip or gl_max_size), it wasn't
+     rendered correctly.  Fixed.
+  - small HUD pics (from scrap) now obey gl_texturemode setting
+  - fixed: non-mipmapped textures that were already loaded weren't adjusted when 
+      gl_texturemode was changed (eg. scrap, alias skins)
+  - sprites are now always mipmapped, and texture uses GL_CLAMP instead of GL_REPEAT
+  - fixed model name for hellknight heads - gib removal now works
+  - when "create" command loads a new model, its model index/hint is now set correctly
+     (affects various features, including corpse/gib removal)
+  - model index/hint is now set up for md2 and md3 models
+  - menu: enter key now works for all settings besides sliders
+  - speedbar is now positioned properly regardless of scr_sbarsize value
+  - speedbar is now sized according to scr_hudscale
+  - changes to scr_sbarsize now recalculate view size
+  - crosshair style 1 color is now closer to chosen color in palette (was too dark); 
+      changed default for crosshaircolor from 254 to 10
+  - crosshair preview now works in menu even if no map is currently loaded
+  - playmod and stopmod commands now work again
+  - music- and sound-related commands are now added even when music/sound is disabled
+	(they don't function, but it eliminates the "unknown command" warnings when running maps)
+  - movie cvars are now available even if movie initialization fails
+  - fixed: autocomplete would stop searching if a blank line was encountered in history
+  - echo commands in cfg or quake.rc files now show up when changing gamedir
+  - dzlib: fixed issues with compressing Nehahra demos in Linux
+  - when starting demo playback, cl_demospeed now reverts to 1
+  - recording a demo no longer causes the values of host_maxfps and cl_truelightning to change
+  - when capturedemo generates an AVI filename, the original extension is now removed first
+  - profile command no longer crashes if no map is running
+  - con_autocomplete: changed from 0/1 to 0/1/2; if 1, completes all except for "say" command
+  - tab-completion now works for lines containing >1 command, separated by semicolons
+	(eg. "god;not"<tab> now produces "god;notarget")
+  - tab-completion can now be used on values for gl_texturemode
+  - added "mp3" command (used by n3sp02; not sure what engines support it)
+  - added "gl_fbr" command - changes values of gl_fb_world, gl_fb_bmodels and gl_fb_models all at once
+  - a sprite's external texture didn't load if it was in the same folder as the sprite.  Fixed.
+  - fixed duplicate "Uninit" call when quitting from Nehahra
+  - fixed crash in oms2 (Conflagrant Rodent) caused by mishandling of nodes > 32767 (Mod_LoadNodes)
+  - if a demo is being recorded, "load" command no longer stops the recording
+  - fixed a timing issue when playing demos that do a lot of stuffcmd calls (Rubicon 2)
+  - changes to cl_demospeed now work when capturing demos
+  - added capcfg command to easily set all capture parameters
+  - auto-generated demo names now include player name
+  - recorded movies can now be larger than 2GB
+  - demo loop no longer continues after doing capturedemo
+  - added ./music/ and ./music/cdtracks/ to the supported locations for mp3/ogg tracks
+
+
+0.95-b1: 2010-04-19
+  - check for sky texture name is now case-insensitive (fixes whiteroom sky)
+  - r_skytype 1 and 2 now get drawn *after* turbulent surfaces (sm156_zwiffle)
+  - movie (AVI) capture:
+      - now works in Linux!
+      - added capture_width and capture_height cvars - movies can now be saved with 
+         dimensions smaller than game's resolution
+      - removed capture_dir cvar (now saves to current gamedir); added capture_gameonly cvar
+      - fixed bug where avi was corrupt if capture_stop was issued from console
+	  - added overwrite prompt if AVI already exists
+	  - capturedemo can now be used with a 2nd arg, to specify AVI filename
+	  - capture_start now generates a filename if none given (like record cmd)
+	  - added capture_info command
+  - demo recording no longer stops when a new map is started, only on stop/disconnect/quit
+  - added minimal support for FTEX protocol demos (provided no extensions are used)
+  - QuakeWorld demos:
+      - playback in paks/dzips/zips now works
+      - fixed timing bug when rewinding
+      - now plays from correct viewpoint, even when player who recorded it is not player #1  
+      - now handles "connectionless packets" slightly better (ignores rather than aborts)
+      - now supports quick-seek (keys 0-9)
+  - when the console is not open, commands that usually do output with page breaks now do
+      continuous output (since end-of-page prompt is not visible)
+  - added extended QC builtins tracebox, min, max, bound
+  - now recognizes keynames that have a "K_" prefix (Quake 0.8/beta3)
+  - demos from Quake 0.8/beta 3 (protocol 12) now can be played
+  - progs.dat from beta Quake now works
+  - when a demo loop is active, but no demo is currently playing, exiting the main menu 
+      now starts the next demo (original Quake behavior)
+  - missing lumps in gfx.wad no longer cause fatal errors, just warnings
+  - missing lmp files no longer cause fatal errors (in most cases)
+  - palette and colormap can be loaded from gfx.wad if lmp files don't exist (Quake beta)
+  - when a model that was a BSP when first loaded is a non-BSP model when it's reloaded,
+      the engine would crash.  Fixed.  (eg. if b_explob.bsp is a BSP in initial gamedir,
+	  but a [misnamed] MDL in new gamedir)
+  - an invalid -game arg no longer results in engine referring to a non-existent path
+  - added tab-completion for argument to "create" command
+  - create command now works with uncached models in Quoth, and for entities that are made static;
+      also lightmaps for spawned bmodels are set up properly
+  - made mapname cvar read-only
+  - resurrection cheat now clears all powerups
+  - reduced initial load time by decreasing screen updates
+  - when the screenshot command is used with a filename that has a recognized image extension,
+      the extension is no longer duplicated
+  - added -nodzlib command-line switch
+  - added auto-complete feature to console; new cvar con_autocomplete [0/1]
+  - menu: added scr_sbarsize (HUD options); removed gl_triplebuffer (General options)
+  - fixed bleeding between characters when gl_smoothfont=1
+  - fixed bleeding on edges of some small picture lmps (eg. face1)
+  - fixed gaps in textboxes with certain menu scale factors
+  - Hexen2: console now supports full 9-bit (512 char) character set; colored text in console 
+      buffer is now maintained when switching to/from Hexen2 
+  - win32: aded a workaround for bug with hardware blending when contrast >= 2
+      (also fixes late bonus flash bug)
+  - Linux: OSS now disables "cooked mode" - prevents mmap error (requires OSS v4.0+)
+  - Linux: dzlib now uses the system temp dir
+  - Linux: vsync now checks for glXSwapIntervalSGI before glXSwapIntervalEXT;  fixed latter's API
+  - (internal): rewrote tab-completion routines; merged more md3 code with mdl code;
+      added "const" to many parameters
+
+
+
+0.94-b3: 2009-09-03
+  - fixed a crash in the "other keys" config menu when a key combo was pressed
+  - when an edict is printed to the console (via the "edicts" command, or otherwise), 
+      the classname line is now highlighted
+  - if user issued "record" with no map active, and then quit before starting a map, the empty
+      demo file would not be deleted as per usual.  Fixed.
+  - fixed buffer overflow in QC built-in print funcs when string length > 255 (qd100ql crash)
+  - fixed a bunch of other places where strings could potentially overflow buffers (strcpy,
+       strcat, strncpy, strncat, COM_FileBase, COM_ForceExtension, COM_DefaultExtension)
+  - fixed a potential bug when rendering >32 dynamic lights
+  - improved error handling when loading wav files with invalid length fields (Aliens crash)
+  - Linux: now specifies an Atom when requesting clipboard data
+
+
+
+0.94-b2: 2009-08-10
+  - tab-complete now works for 1st & 2nd args to "record" command (both match against bsp's)
+  - tab-complete no longer has an effect on arguments beyond the expected number
+  - if tab-complete filled in the only match for a cmd or cvar, and appended a space, tab-complete
+      wouldn't work on the empty parameter.  Fixed.
+  - if tab-complete filled in a filename with spaces, tab-cycle wouldn't work.  Fixed.
+  - fixed TE_BLOOD so it looks reasonable when not using QMB particle system
+  - fixes wackiness in Quoth hammer interpolation
+  - when game is paused, alias models now hold their interpolated position, rather than snapping to
+      the next position
+  - changed check for an "oversized" map to >4096 or <-4096 (was >= and <=) 
+  - fixed issue where in a map with points outside +/-4096, a leaf node containing no msurfs wouldn't
+      have its bounds set properly
+  - when starting/loading a map with gl_interpolate_animation=1, models no longer "morph" into their
+      initial position
+  - Hexen II: savegame dir set properly on gamedir change; alias model colorshade now handled
+  - better support for non-US keyboards
+      - all non-alphanumeric printable characters are now mapped at runtime
+	  - removed hard-coded shift+key table; now determined on-the-fly via OS calls
+	  - alt+ctrl+key (or ALTGR+key) combos are now supported
+	  - added additional keynames for bindings: EXKEY1 to EXKEY8
+	  - new command-line switch "-uskbd" can be used to force US keyboard layout
+  - added more keynames: NUMLOCK, SCRLOCK, PRINTSCR, LALT, RALT, LCTRL, RCTRL, LSHIFT, RSHIFT, 
+      WINKEY, LWINKEY, RWINKEY, POPUPMENU
+  - left & right alt/ctrl/shift keys can now be bound separately
+  - win32: behavior of keypad numbers now depends on state of numlock - if on, they act as numbers;
+      if off, they function as arrows/pgup/pgdn/home/end/ins/del (unless -uskbd is specified)
+  - capslock now results in uppercase letters in the console
+  - Customize Keys menu: search for key bindings is no longer case-sensitive
+  - Linux: in windowed mode, mouse clicks/wheel now are handled even when the cursor is not grabbed
+  - Linux: (maybe) fixed jammed key that sometimes occurred when mouse was grabbed/released
+  - Linux: DGA is no longer used for keyboard handling
+  - Linux: added better error handling if fullscreen mode fails (restores desktop resolution)
+  - Linux: when setting fullscreen mode, if the specified width/height is not available, the next higher
+      setting is used.  Now the video takes up the entire screen instead of just the specified size.
+  - Linux: paste into console now works! (ctrl+v)
+  - added some error recovery to handle bad data during demo playback
+  - added a check to prevent "record" command from being used while a demo is playing
+  - fixed several errors in time calculation when playing a demo that's in a pak
+  - changed default values of 2 cvars: r_skytype --> 1; scr_showfps --> 0
+  - fixed a bug that would sometimes limit a cvar to only 2 decimal places
+  - when exec'ing quake.rc, stuffcmds now is done before startdemos (fixes issue where a failed
+      +load command still started demo loop)
+  - if a setting was loaded from a reQuiem.cfg not in the current gamedir, it wouldn't get written to 
+        the gamedir's reQuiem.cfg.  Fixed.
+  - if a keybinding loaded from a cfg file is cleared, this now gets written to reQuiem.cfg
+  - pr_checkextension cvar is now saved to cfg file
+  - made cmdline and registered cvars read-only
+  - the last item in the Controls menu wasn't being drawn
+  - mouse buttons & wheel now can be used to control demo playback (wheel=speed, buttons=fw/rev)
+  - fixed key binding issue in Customize Keys menu (broken last build)
+  - win32: Customize Keys menu now registers mouse clicks even when _windowed_mouse is 0 or 1
+  - fixed a crash in Customize Keys menu when left or right arrow key was pressed
+  - added a second Customize Keys menu containing more general commands
+  - added Preach's filtering options to "edicts" command
+  - if a filename is supplied to the "screenshot" command, and it has no extension, one is added
+      based on the scr_sshot_format cvar (and that format is used)
+  - added overbright world lighting option (gl_lightmode = 3)
+  - added gl_texbrighten cvar to control whether bmodels should be loaded using a brighter palette
+      (previous versions always did this; default is now to not)
+  - sped up sky rendering in the following cases: solid sky texture; skybox with gl_skyhack=0;
+      MH sky with gl_skyhack<2 (by rendering un-subdivided polys)
+  - r_skycolor cvar now supports value of "auto", meaning color is calculated automatically based on
+      map's sky texture.  This is now the default.
+  - Marcher's hi-res sprites now work
+      - added support for the EF_ADDITIVE entity effect (for sprites *only*)
+	  - so that additive blend works, sky now always gets drawn before sprites
+      - added another naming convention for external sprite textures (in same path as sprite model,
+        with filename containing both overall frame number and frame number within group)
+
+
+
+0.94-b1: 2009-05-13
+  - a cvar or key binding is now saved to reQuiem.cfg only if it has changed from what was loaded from 
+      the standard cfg's (default/autoexec/config)
+  - tab-complete now works for argument to timedemo command
+  - modal messages (eg. demo overwrite/compress prompts) now get drawn properly over intermission screen
+  - if cl_demo_compress is 1, and a demo is being recorded, and another record command is issued, and the
+       new filename already exists (whew!), the compress prompt now comes before the overwrite prompt
+  - if compressing a demo, and dzip/zip with current name already exists, an overwrite prompt is now shown
+  - if demo being recorded is empty, it is deleted when the "stop" command is issued
+  - fixed situations where the intermission screen would remain instead of exiting to the console
+      - after playing a demo that ended with an intermission screen
+	  - when a server (or demo) issued a reconnect to a map that didn't exist client-side
+      - when a map issued a changelevel to a non-existent map
+  - fixed a bug in viewmodel and player lighting when ambient light level is 0
+  - dynamic lights no longer affect the color of lighting on alias models (it just looked cheesy)
+  - added r_modelbrightness cvar to allow alias model light level to be customized
+  - changed fog settings for MH sky so it doesn't completely obscure sides
+  - fixed bug in MH sky where surfaces that should be hidden by skybrushes were not
+  - raised top of MH skybox slightly; reduced texture scale by a factor of 2
+  - added gl_skyhack cvar to toggle skybox & MH sky optimizations (fast, but a bit buggy)
+      - if 1, enables optimizations for skyboxes only
+	  - if 2, does it for skyboxes and MH sky
+  - removed gl_ztrick cvar (not compatible with above optimizations)
+  - (internal): added .color field to dlight_t and dlightinfo_t
+  - tint from Quoth's cross of deflection no longer remains when a saved game is loaded
+  - fog that is triggered mid-map no longer remains once that map is closed (eg. warpa)
+  - if there is a map loaded when the screenshot command is issued, the screenshot is now named based
+      on the bsp name
+  - when the screenshot command is issued with the filename argument, a 2nd arg can now be given to 
+      specify how many seconds to wait before taking the shot
+  - decreased effective fog density by ~30%
+  - keys used to "close" and "go back" in menus can now be customized
+      - added cvars key_menuclose and key_menuprev
+  - the engine now adds the folder "reQuiem_base" (if present) to the top of the path hierarchy
+       (searched after id1 when loading game files; also used to store cmdhist.dat)
+  - added gl_interpolate_animation setting to General Video Options menu
+  - pressing the console key from while in a menu now goes to the console (imagine that!)
+  - toggleconsole no longer clears the active input line
+  - added "mouse steering" noclip mode from Fitz; toggled via new sv_altnoclip cvar [default=1]
+  - fixed the capital D in bigfont.lmp
+  - Linux: now properly handles key combos (alt/ctrl/shift + key)
+
+
+  
+0.93-b3: 2009-04-01
+  - moving the mouse during demo playback now shows the on-screen display
+  - increased MAX_ENT_LEAFS from 16 to 64 (fixes the "disappearing brush model" bug)
+  - fixed a bug in the memory manager (Cache_TryAlloc) that could cause a hang when relocating memory
+      (probably introduced in v0.90-b3)
+  - improved performance with animated and/or dynamic lighting:
+      - animated lights are now just as fast when multitexturing is on as when it's off 
+	     (reduced amount of lightmap uploading by ~10x)
+      - if a map has no colored lighting, 8-bit lightmaps are now used (instead of 24-bit)
+	  - non-colored lightmaps in a .lit file are loaded as 8-bit
+  - when gl_lightmode or r_fullbright is changed, lightmaps now get reloaded only when they are needed,
+      instead of all being done immediately
+  - changed the lighting code for alias models; colored lighting now shows up
+  - additional frustum-based culling is now performed on world model surfaces
+  - fixed a bug where pressing esc from console would sometimes fail to bring up menu, but stop passing
+      keypresses to console (eg. after using "disconnect" to close a map)
+  - added a hack to smooth out motion of rotating entities
+  - changed handling of oversized (>4096) coordinates so protocol hack is no longer required
+  - when tab-completing a command or cvar, if cl_advancedcompletion=1 and there's only 1 match, a space
+      is added after the cmd/cvar is filled in
+  - raised some alias model limits (vertices & tris)
+  - progs.dat with >32767 globals now work (max is 65535)
+  - lowered view model a tiny bit (SSG was annoying me)
+
+
+
+0.93-b2: 2009-03-06
+  - "record" command now asks user for confirmation if a demo with the given name already exists
+  - if client disconnected while recording a demo, compression procedure wasn't completed until
+      a new map was opened.  Fixed.
+  - if user was recording a demo and then changed maps (via the "map" command), compressing the
+      demo resulted in the argument to "map" being lost.  Fixed.
+  - added tip about backspace to menu (displayed when user exits menu, then reopens < 2s later)
+  - added sv_entpatch to Compatibility menu
+  - added "Game" section to Options menu
+  - printtxt command now also works for files that don't have the .txt extension
+  - dzlib: now supports creation of zip archives
+  - demos can now be compressed as standard zips (in addition to dzips)
+  - added new cvar cl_demo_compress_fmt (0 = dzip, 1 = zip; [default = 0])
+  - when compressing a demo, if a dzip/zip with that name already exists, reQuiem will attempt
+      to generate a unique filename by appending a numerical suffix
+  - playdemo now works with zips added/created after reQuiem starts; also added tab-complete support
+  - v_cshift changes now work properly when rewinding a demo (eg. Quoth's trinity)
+  - Win32 (internal): process & thread handles created when dzip.exe is run are now closed properly
+  - Win32: fixed up window/taskbar icon somewhat
+  - fixed buffer overflow in SV_SendClientDatagram (broken since v0.92-b1) - fixes lrb.bsp crash
+  - added rudimentary support for QuakeC Extension System (pr_checkextension cvar, and checkextension function)
+  - if an entity's .touch function modified trigger list, reQuiem could hang. Fixed. (Pro-X teleports)
+  - commands containing characters with hi-bit set are now parsed correctly
+  - added client-side support for new FitzQuake protocol 666
+  - (internal): lines added to cbuf are now tagged with their source (cfg file, console, cmdline, etc.), 
+      to enable smarter conditional handling
+  - when changing gamedir, commands from command-line are no longer executed (eg. +map, +load)
+  - if a map's worldspawn specifies a skybox that doesn't exist, no skybox is used 
+      (previously, the skybox from the last-played map remained)
+  - resurrection cheat didn't reset some values properly if player was gibbed.  Fixed.
+  - when an alias model with the standard .mdl extension is to be loaded, reQuiem now checks for
+      .md2 and .md3 files with the same name, and loads whichever is found first
+  - md3: if a skin doesn't include a path, reQuiem now checks in the "textures" dir
+  - Linux: changed default behavior of stdout: it's now off unless -stdout is in the command-line
+
+
+
+0.93-b1: 2009-01-12
+  - dzlib: added basic .ZIP support (extract only; store/deflate only; no Zip64, encryption, etc.)
+  - .zip/.pk3 archives are now supported
+  - added hack to provide impulse 12 (CycleWeaponReverse) functionality to progs that are missing it
+	- added cvar sv_imp12hack to enable/disable behavior
+  - if player is dead, and the give-health cheat is used ("give h <x>"), player is resurrected
+  - added r_flatlightstyles cvar to toggle animated lights
+  - fixed a bug where extended protocol was not used if MAX_SOUNDS was the only limit exceeded (nsoe5)
+  - replaced sv_oldprotocol cvar (0/1) with sv_protocol (0/15/10002)
+  - changing the value of r_fullbright or gl_lightmode resulted in the lightmaps of the previous level
+	being reloaded, even if the level was no longer open.  Fixed.
+  - Linux: shift-tab key combo (for reverse-cycling of tab-completion results in console) was not being 
+ 	translated properly.  Fixed.
+  - improved functionality of printtxt command:
+     - now works for text files anywhere in Quake searchpaths, not just gamedir
+     - pauses after each screenful of text
+     - Linux: fixed output when file has carriage-returns
+  - tab-complete now works for arg of changelevel command
+  - made screen behind menus & "modal dialogs" a bit darker
+  - entire screen now gets drawn behind modal dialogs
+  - the following commands now pause after each screenful of output: printtxt, cmdlist, cvarlist, 
+    maplist, demolist, builtinlist, entities, edicts, mcache, soundlist
+  - added screenshot settings to menu (Options->Video->General)
+  - added new cvar con_linespacing (space between lines of text in console; default=0)
+
+
+
+0.92-b2: 2008-11-21
+  - Linux: fixed host_framerate functionality
+  - game/gamedir command now ensures that arg is a directory
+  - added fade effect when icon overlay disappears during demo playback
+  - Video Options, Textures, Particles menus: "custom" preset is preserved even after menu is closed
+  - Compatibility menu: added settings for fullbrights, ext textures, alpha models, and 32-bit sprites; 
+    split Quake preset into SW and GL Quake; added tip for mappers
+  - Video Options: added gl_triplebuffer and host_maxfps to General section
+  - menu: for variables that are adjusted via sliders, the enter key no longer has an effect
+  - updated low memory message to recommend doubling current heapsize (used to suggest 32MB still!)
+  - maps with points outside standard Quake coordinate space can now be loaded; also added protocol hack
+	to handle large coords as floats instead of shorts (only for local games)
+  - oversized lightmaps are now ignored, rather than being fatal
+  - fixed issue where fog remained from one map to the next if there was no disconnect in between
+
+
+
+0.92-b1: 2008-11-05
+  - added Menu/Console section to Options menu
+  - reorganized Video Options menu and added a bunch of stuff (HUD, crosshair, sky, etc)
+  - ESC now closes menu completely; backspace returns to previous menu
+  - reformatted info shown when you type in a cvar name
+  - now ensures id1/autoexec.cfg is exec'd even if current gamedir has an autoexec too
+  - playdemo now works better with dzips added after game has started:
+      - .dz suffix doesn't have to be entered
+      - tab-completion includes them in list of matches
+  - increased spacing between small menu items
+  - when demo recording is started mid-map, monster & secret counts are now stored correctly
+  - when demo playback is paused, time really freezes now (status bar time stops; particles don't
+      disappear; animation of bonus items, torches and sky stops; dynamic lights don't decay)
+  - when game is paused, sky stops and dynamic lights no longer decay
+  - removed 100ms frametime cap that limited the speed of demo FF/RW
+  - REALLY fixed the Compress-prompt-doesn't-wait-for-response issue that I said I fixed last time :P
+  - demo compress->verify->delete sequence now works when quitting even if dzlib is not active (using dzip app)
+  - added support for several more keys during demo playback:
+      - Enter key selects forward playback at normal speed
+      - 0-9 keys quickly jump to a different time (0 = start, 5 = 50%, 9 = 90%, etc.)
+  - removed cl_smart_rewind cvar (since demo rewind info is now stored in memory instead of on disk,
+      speed hit is negligible, so it's always enabled)
+  - added progress bar to overlay shown during demo playback
+  - new cvar scr_hudscale can be used to enlarge centerprints, fps, demo overlay, etc.
+  - Hexen II: strings.txt and infolist.txt are now loaded properly after "gamedir hexen2"
+  - tweaked fog & transparency in MHQuake sky (r_skytype=0) to improve contrast between layers
+  - default crosshair (crosshair=1) now obeys crosshairsize, crosshaircolor, and gl_crosshairalpha
+  - sky textures can now be loaded from external image files, and size is not restricted to 256x128
+  - now recognizes flame & weapon models from Quoth (for special handling of interpolation & shadows)
+  - "create" command now updates the total_monsters count, and works correctly for bmodels
+  - shadows above eye-level are no longer drawn
+  - added gl_externaltextures_models cvar (for alias models)
+  - added gl_fb_world cvar (was part of gl_fb_bmodels functionality)
+  - cleaned up multitexturing code for bmodels
+  - many more cvars (mostly related to rendering) now get saved to reQuiem.cfg
+  - gamedir command: fixed a bug that could cause arguments beyond the first one to be ignored
+
+
+
+0.91-b2: 2008-09-04
+  - added support for multiple gamedirs (via gamedir command or -game on command-line)
+  - added support for .ent files (in conjunction with new cvar sv_entpatch)
+  - changed cvar cl_advancedcompletion from boolean to 3-value [0/1/2];  when 2, <tab> does 
+      JoeQuake-style partial completion
+  - demo menu: can now view either all demos in path, or browse by directory
+  - maplist and demolist commands now include filesize
+  - hi-res alias model textures are once again loaded properly from model's folder (usually progs/)
+  - server info message now includes "reQuiem" + version
+  - sv_fishfix: added extra check at spawn time to make sure fix behaves correctly
+  - simplified warnings for missing spawn functions when developer=0 (shows only 1 warning 
+      per unique classname, and omits other entity info)
+  - reduced warnings for missing fields and missing model precaches to 1 per name
+  - Host_PreSpawn_f now handles buffer overflow correctly, switching to high-capacity protocol
+	- nsoe3.bsp now works when loaded via changelevel
+  - when changing gamedir, reQuiem.cfg is written, cvars are reset to defaults, and keys are unbound
+  - fixed: if you quit the game while recording a demo, and cl_demo_compress was 1, the "Compress?..." 
+      prompt didn't wait for an answer
+  - Hexen II: fixed a bug parsing the baseline message in v1.07 demos
+  - fixed issue where waterfog was disappearing when r_skytype=0
+  - when gl_waterfog=1, waterfog color now matches whatever liquid you're in 
+    (gl_waterfog=2 still uses preset values from FuhQuake)
+      - changed cvar defaults: gl_waterfog --> 0;  gl_waterfog_density --> 0.5
+  - fixed issue where screen stays tinted when disconnecting while underwater
+  - fixed issue where last line of cfg file didn't work if there was no return after it
+  - increased MAX_EFRAGS from 640 to 2048
+  - doubled the size of vis data buffers
+  - console can no longer be scrolled back beyond the beginning
+
+
+    
+0.91-b1: 2008-08-23
+  - added JPEG support for textures & screenshots
+      - renamed cvar scr_sshot_type to scr_sshot_format (to match latest JoeQuake).  
+        Default is now "jpg".
+      - added new cvar jpeg_compression_level for screenshots
+  - added option to dzip demos after recording
+     - dzlib: added DZ_Verify, DZ_VerifyAll, DZ_Create, DZ_AddFile, DZ_GetVersion, DZ_GetFileInfoEx
+     - added cl_demo_compress cvar
+  - fixed long-standing bug wrt music & external texture loading - I now try each possible
+    pathname variation before moving to the next path in the Quake file hierarchy
+      - eg. track04.mp3 in ID1 is no longer found ahead of T04.mp3 in current gamedir
+  - Linux: gamedir command now properly checks whether dir is valid before continuing
+  - sky is now drawn when noclip is on
+  - fixed problem where sprites using external textures were not properly transparent
+  - fixed garbage pixels in key & RL icons of Hipnotic HUD
+  - entities can now use "alpha" field even if not supported by progs.dat
+  - updated music code to handle track# > 99
+  - added sv_fishfix cvar (to prevent monster_fish from being counted twice)
+  - SV_CreateBaseline now handles buffer overflow correctly, switching to high-capacity protocol
+      - nsoe3.bsp now works
+  - fixed crash when first texture in a map is null - ne_lend.bsp now works
+  - tab-completion for playdemo command now works with relative paths (those starting with "../")
+
+
+
+0.90-b3a: 2008-07-29
+  - mp3/ogg tracks: re-added support for 3-digit track number (trackxxx); fixed typo
+    that prevented Txx format from working
+
+
+
+0.90-b3: 2008-07-28
+  - Linux: replaced asm code with the C equivalents (BoxOnPlaneSide in particular 
+    was failing under certain conditions)
+      - fixes disappearing weapon & void flash when fov != 90
+  - replaced PerpendicularVector function with that from original Quake
+  	  - fixes another void flash problem in Linux
+  - Nehahra-specific cvars are now available only when current game is Nehahra
+  - enabled switching to/from Hexen II via gamedir command
+  - Hexen II status bar now works when scr_sbarsize != 0
+  - after gamedir change, quake.rc and reQuiem.cfg files are executed
+  - cutscene camera smoothing no longer uses a custom server/client message.  
+    However, it now works only if server & client are running in the same process
+        - renamed cvar sv_cutscenehack to host_cutscenehack
+  - when running oversized maps, reQuiem now uses same protocol as aguirRe's engines
+  - as a result of above 2 changes, reQuiem no longer requires a custom protocol
+  - scr_conspeed should no longer be fps-dependent
+  - (internal): modified SCR_ModalMessage to accept keys other than y/n/esc
+  - screen now updates while SCR_ModalMessage is waiting for a key
+
+
+
+0.90-b2: 2008/07/20
+  - changed _windowed_mouse cvar from boolean to 3-value [0/1/2] (off/auto/on)
+  - Linux: improved mouse capture/release in windowed mode (when _windowed_mouse=1)
+  - Linux: now clears key states when window is re-activated
+  - Linux: changed default mode to fullscreen.  Use -window to override.
+  - mp3/ogg music: now looks for files in "sound/cdtracks" folder
+  - Options menu: re-added "Go to console" and "Reset to defaults"
+  - Advanced video options menu: renamed "High Quality" preset to "Max FX"; added "Standard" 
+	and "Classic" presets; added GL_NEAREST_MIPMAP_LINEAR to "Texture filter" choices
+  - added scr_sbarsize cvar for magnifying status bar
+  - replaced cvar scr_menuscale with scr_menusize (to be consistent with scr­_sbarsize)
+  - fixed HUD icon issues when -rogue and cl_sbar=0:
+	- icon in wrong spot when active weapon is a rogue-specific one
+	- secondary ammo not being shown
+	- non-active weapon icon not drawn if player doesn't have equivalent id one
+	  (also occurs when cl_sbar=1)
+  - added cheat codes for rogue-specific weapons ("give 4a" to "give 8a")
+  - if running quoth, hipnotic HUD is used
+
+
+
+0.90-b1: 2008/07/12
+  - first private beta release

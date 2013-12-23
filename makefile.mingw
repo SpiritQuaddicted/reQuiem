@@ -1,0 +1,128 @@
+#
+# JoeQuake Makefile for Win32
+#
+# by Slawomir Mazurek <homer13@o2.pl>
+# TODO: resource file; get rid of console window
+
+CC 		:= gcc
+#_E 		:= @
+_E		:=
+
+################
+
+default_target: glx
+
+all: glx
+
+################################
+# Directories for object files #
+################################
+
+GLX_DIR		:= release_glx
+
+################
+# Binary files #
+################
+
+GLX_TARGET	:= $(GLX_DIR)/reQuiem.exe
+
+################
+
+C_BUILD = $(_E)$(CC) -c -o $@ $(_CFLAGS) $<
+S_BUILD = $(_E)$(CC) -c -o $@ $(_CFLAGS) -x assembler-with-cpp $<
+BUILD = $(_E)$(CC) -o $@ $(_OBJS) $(_LDFLAGS)
+MKDIR = $(_E)md $@
+RM_FILES = $(_E)del $(GLX_DIR)\*.o
+RM_DIRS = $(_E)rd $(GLX_DIR)
+
+################
+
+$(GLX_DIR):
+	$(MKDIR)
+
+#CFLAGS += -Did386	-funsigned-char		-O6 \
+#	-D_WIN32	-march=pentiumpro	-Wall \
+#	-funroll-loops	-fomit-frame-pointer	-DNDEBUG \
+#	-ffast-math	-fno-strength-reduce	-fexpensive-optimizations
+
+CFLAGS += -Did386	-funsigned-char		-O6 \
+	-D_WIN32	-march=pentiumpro	 \
+	-fno-unit-at-a-time -funroll-loops	-fomit-frame-pointer	-DNDEBUG \
+	-ffast-math	-fno-strength-reduce	-fexpensive-optimizations
+LDFLAGS := -lm
+
+#######
+# GLX #
+#######
+
+GLX_C_FILES := \
+	cd_common	cd_win	chase		cl_demo		\
+	cl_input	cl_main	cl_parse 	cl_parse_qw		\
+	cl_tent 	cmd		common	common_file		\
+	conproc	console 	crc		cvar		dzip	\
+	\
+	gl_alias		gl_brush	gl_draw	gl_drawalias	\
+	gl_drawsprite	gl_mesh		gl_refrag		gl_rlight	\
+	gl_rmain	gl_rmisc	gl_rpart	gl_rsurf		\
+	gl_screen	gl_sky	gl_sprite	gl_warp		\
+	gl_fog		gl_md2	gl_md3	gl_texture		\
+	\
+	host		host_cmd	host_saveload	image		\
+	keys 		mathlib	menu			music		\
+	in_win		model	movie		movie_avi		\
+	nehahra		net_win		net_wins	net_dgrm		net_loop	\
+	net_main	net_vcr 	net_wipx		pr_cmds	\
+	pr_edict	pr_exec	r_part 		sbar		\
+	\
+	snd_dma	snd_win	snd_mem		snd_mix	\
+	sv_main	sv_move	sv_phys		sv_user	\
+	sys_win	version	vid_common_gl	vid_wgl	\
+	view		wad		world			zone		\
+	\
+	hexen2	cl_effect_H2	cl_parse_H2			\
+	menu_H2	progs_H2 		r_part_H2		sbar_H2 
+
+GLX_S_FILES := \
+	math		snd_mixa	sys_x86
+
+GLX_C_OBJS := $(addprefix $(GLX_DIR)/, $(addsuffix .o, $(GLX_C_FILES)))
+GLX_S_OBJS := $(addprefix $(GLX_DIR)/, $(addsuffix .o, $(GLX_S_FILES)))
+
+GLX_CFLAGS := $(CFLAGS) \
+	-DGLQUAKE	-DWIN32 -D_WINDOWS -D_MBCS
+
+# uncomment following line for static linking of libpng
+#GLX_LDFLAGS := -l kernel32 -l user32 -l gdi32 -l dxguid -l opengl32 -l wsock32 -l winmm -l png -l z
+GLX_LDFLAGS := -l kernel32 -l user32 -l gdi32 -l dxguid -l opengl32 -l wsock32 -l winmm
+
+glx: _DIR := $(GLX_DIR)
+glx: _OBJS := $(GLX_C_OBJS) $(GLX_S_OBJS)
+glx: _LDFLAGS := $(GLX_LDFLAGS)
+glx: _CFLAGS := $(GLX_CFLAGS)
+glx: $(GLX_TARGET)
+
+$(GLX_TARGET): $(GLX_DIR) $(GLX_C_OBJS) $(GLX_S_OBJS)
+	$(BUILD)
+
+$(GLX_C_OBJS): $(GLX_DIR)/%.o: %.c quakedef.h
+	$(C_BUILD)
+
+$(GLX_S_OBJS): $(GLX_DIR)/%.o: %.s
+	$(S_BUILD)
+
+glxclean: _FILES += $(GLX_C_OBJS) $(GLX_S_OBJS)
+glxclean: _DIRS := $(GLX_DIR)
+glxclean:
+	$(RM_FILES)
+	$(RM_DIRS)
+
+glxclobber: _FILES := $(GLX_TARGET)
+glxclobber: glxclean
+
+#################
+
+clean: glxclean
+
+clobber: _DIRS := $(GLX_DIR)
+clobber:
+	$(RM_DIRS)

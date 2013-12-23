@@ -1,0 +1,130 @@
+#
+# JoeQuake Makefile for Linux
+#
+# by Slawomir Mazurek <homer13@o2.pl>
+#
+# JDH: customized for reQuiem; removed asm code from Linux build
+
+CC 		:= gcc
+_E 		:= @
+
+################
+
+default_target: glx
+
+all: glx
+
+################################
+# Directories for object files #
+################################
+
+GLX_DIR		:= release_glx
+
+################
+# Binary files #
+################
+
+GLX_TARGET	:= $(GLX_DIR)/reQuiem.glx
+
+################
+
+C_BUILD = $(_E)$(CC) -c -o $@ $(_CFLAGS) "$<"
+#S_BUILD = $(_E)$(CC) -c -o $@ $(_CFLAGS) -DELF -x assembler-with-cpp "$<"
+BUILD = $(_E)$(CC) -o $@ $(_OBJS) $(_LDFLAGS)
+MKDIR = $(_E)mkdir -p $@
+RM_FILES = $(_E)rm -f $(_FILES)
+RM_DIRS = $(_E)rm -fr $(_DIRS)
+
+################
+
+$(GLX_DIR):
+	$(MKDIR)
+
+#CFLAGS += -Did386	-funsigned-char		-O6 \
+CFLAGS += -funsigned-char		-O6 \
+	-D__linux__	-march=pentiumpro	 \
+	-funroll-loops	-fomit-frame-pointer	-DNDEBUG \
+	-ffast-math	-fno-strength-reduce	-fexpensive-optimizations
+
+LDFLAGS := -lm
+
+#######
+# GLX #
+#######
+
+GLX_C_FILES := \
+	cd_common	cd_linux	chase		cl_demo		\
+	cl_input	cl_main	cl_parse 	cl_parse_qw		\
+	cl_tent 	cmd		common 	common_file		\
+	console	crc		cvar 		dzip			\
+	\
+	gl_alias		gl_brush	gl_draw	gl_drawalias	\
+	gl_drawsprite	gl_mesh 	gl_refrag	gl_rlight		\
+	gl_rmain	gl_rmisc	gl_rpart	gl_rsurf	\
+	gl_screen	gl_sky	gl_sprite	gl_warp		\
+	gl_fog		gl_md2	gl_md3 	gl_texture		\
+	\
+	host		host_cmd	host_saveload	image		\
+	keys		mathlib		menu			model 	\
+	movie		movie_avi	music \
+	nehahra	net_bsd	net_dgrm 		net_loop 	\
+	net_main	net_udp	net_vcr		pr_cmds	\
+	pr_edict	pr_exec	r_part 		sbar		\
+	\
+	snd_dma	snd_linux	snd_mem 		snd_mix	\
+	sv_main	sv_move	sv_phys 		sv_user	\
+	sys_linux	version	vid_common_gl	vid_glx	\
+	view		wad		world			zone		\
+	\
+	hexen2	cl_effect_H2	cl_parse_H2			\
+	menu_H2	progs_H2 		r_part_H2		sbar_H2 
+
+#GLX_S_FILES := \
+#	math		snd_mixa	sys_x86
+
+GLX_C_OBJS := $(addprefix $(GLX_DIR)/, $(addsuffix .o, $(GLX_C_FILES)))
+#GLX_S_OBJS := $(addprefix $(GLX_DIR)/, $(addsuffix .o, $(GLX_S_FILES)))
+
+GLX_CFLAGS := $(CFLAGS) \
+	-DGLQUAKE		-I/usr/include		-I/usr/X11R6/include
+
+GLX_LDFLAGS := $(LDFLAGS) \
+	-lGL			-L/usr/X11R6/lib	-lX11 \
+	-lXext			-lXxf86dga		-lXxf86vm
+#	-lpng
+#	-ljpeg
+
+glx: _DIR := $(GLX_DIR)
+#glx: _OBJS := $(GLX_C_OBJS) $(GLX_S_OBJS)
+glx: _OBJS := $(GLX_C_OBJS)
+glx: _LDFLAGS := $(GLX_LDFLAGS)
+glx: _CFLAGS := $(GLX_CFLAGS)
+glx: $(GLX_TARGET)
+
+#$(GLX_TARGET): $(GLX_DIR) $(GLX_C_OBJS) $(GLX_S_OBJS)
+$(GLX_TARGET): $(GLX_DIR) $(GLX_C_OBJS)
+	$(BUILD)
+
+$(GLX_C_OBJS): $(GLX_DIR)/%.o: %.c quakedef.h
+	$(C_BUILD)
+
+#$(GLX_S_OBJS): $(GLX_DIR)/%.o: %.s
+#	$(S_BUILD)
+
+#glxclean: _FILES += $(GLX_C_OBJS) $(GLX_S_OBJS)
+glxclean: _FILES += $(GLX_C_OBJS)
+glxclean: _DIRS := $(GLX_DIR)
+glxclean:
+	$(RM_FILES)
+	$(RM_DIRS)
+
+glxclobber: _FILES := $(GLX_TARGET)
+glxclobber: glxclean
+
+#################
+
+clean: glxclean
+
+clobber: _DIRS := $(GLX_DIR)
+clobber:
+	$(RM_DIRS)
