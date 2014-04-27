@@ -821,9 +821,9 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 	// Discard the unicode args.
 	LocalFree(wargv);
 
-	// Discard args past MAX_NUM_ARGVS, construct the com_cmdline var, and
-	// handle safe-mode switches.
-	COM_InitArgv (parms.argc, parms.argv);
+	// Discard args past MAX_NUM_ARGVS, construct the "cmdline" console var,
+	// and handle safe-mode switches.
+	COM_InitArgv (parms.argc, parms.argv, lpCmdLine);
 
 	parms.argc = com_argc;
 	parms.argv = com_argv;

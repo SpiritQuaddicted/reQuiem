@@ -626,7 +626,7 @@ int main (int argc, const char **argv)
 
 	memset (&parms, 0, sizeof(parms));
 
-	COM_InitArgv (argc, argv);
+	COM_InitArgv (argc, argv, NULL);
 	parms.argc = com_argc;
 	parms.argv = com_argv;
 
