@@ -946,8 +946,7 @@ void COM_InitArgv (int argc, const char **argv)
 		// necessary.
 		while ((n < (CMDLINE_LENGTH - 1)) && arg[i])
 		{
-			if ((arg[i] == '"') ||
-				 ((!has_whitespace) && (arg[i] == '\\')))
+			if ((arg[i] == '"') || ((!has_whitespace) && (arg[i] == '\\')))
 			{
 				com_cmdline[n++] = '\\';
 				if (n >= CMDLINE_LENGTH)
