@@ -914,21 +914,53 @@ void COM_CheckRegistered (void)
 COM_InitArgv
 ================
 */
+static char	*whitespace = " \t";
+
 void COM_InitArgv (int argc, const char **argv)
 {
 	qboolean	safe;
 	int		i, j, n;
+	qboolean	has_whitespace;
 
 // reconstitute the command line for the cmdline externally visible cvar
 	n = 0;
 
 	for (j=0 ; j<MAX_NUM_ARGVS && j<argc ; j++)
 	{
+		char *arg = argv[j];
 		i = 0;
 
-		while ((n < (CMDLINE_LENGTH - 1)) && argv[j][i])
-			com_cmdline[n++] = argv[j][i++];
+		// See if we need to quote the arg.
+		if (strcspn(arg, whitespace) == strlen(arg))
+		{
+			has_whitespace = false;
+		}
+		else
+		{
+			has_whitespace = true;
+			if (n < (CMDLINE_LENGTH - 1))
+				com_cmdline[n++] = '"';
+		}
 
+		// Copy in the chars of the arg. Backslash any quote or backslash chars as
+		// necessary.
+		while ((n < (CMDLINE_LENGTH - 1)) && arg[i])
+		{
+			if ((arg[i] == '"') ||
+				 ((!has_whitespace) && (arg[i] == '\\')))
+			{
+				com_cmdline[n++] = '\\';
+				if (n >= CMDLINE_LENGTH)
+					break;
+			}
+			com_cmdline[n++] = arg[i++];
+		}
+
+		// Finish quoting the arg if needed.
+		if (has_whitespace && (n < (CMDLINE_LENGTH - 1)))
+			com_cmdline[n++] = '"';
+
+		// Add a space for the next arg, or bail out when max length hit.
 		if (n < (CMDLINE_LENGTH - 1))
 			com_cmdline[n++] = ' ';
 		else
