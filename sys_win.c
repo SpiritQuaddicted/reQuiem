@@ -789,7 +789,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 	//   variables.
 	// - Parse command line ourselves, using the standard Microsoft rules for
 	//   C/C++ programs.
-	// - Get the unicode command line with CommandLineToArgvW and parse it
+	// - Get the unicode command line with GetCommandLineW and parse it
 	//   with CommandLineToArgvW. But then we need convert everything to ANSI
 	//   to stay compatible with the rest of the engine.
 
