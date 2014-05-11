@@ -797,6 +797,9 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 
 	// Get the args in unicode.
 	wargv = CommandLineToArgvW(GetCommandLineW(), &(parms.argc));
+	// Cap argc at our internal max.
+	if (parms.argc > MAX_NUM_ARGVS)
+		parms.argc = MAX_NUM_ARGVS;
 	// Allocate space pointers to ANSI args.
 	parms.argv = Q_malloc(sizeof(char*) * parms.argc);
 	// First arg is always just empty-string.
@@ -821,8 +824,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 	// Discard the unicode args.
 	LocalFree(wargv);
 
-	// Discard args past MAX_NUM_ARGVS, construct the "cmdline" console var,
-	// and handle safe-mode switches.
+	// Construct the "cmdline" console var and handle safe-mode switches.
 	COM_InitArgv (parms.argc, parms.argv, lpCmdLine);
 
 	parms.argc = com_argc;
