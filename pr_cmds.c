@@ -129,7 +129,7 @@ void PF_objerror (void)
 	ED_Print (ed);
 	ED_Free (ed);
 
-	Host_Error ("Program error");
+	//Host_Error ("Program error"); //johnfitz -- by design, this should not be fatal
 }
 
 
