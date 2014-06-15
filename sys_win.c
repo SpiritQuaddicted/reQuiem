@@ -750,7 +750,6 @@ WinMain
 */
 HINSTANCE	global_hInstance;
 int			global_nCmdShow;
-char		*argv[MAX_NUM_ARGVS];
 static char	*empty_string = "";
 //HWND		hwnd_dialog;
 
@@ -760,6 +759,8 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 	double		time, oldtime, newtime;
 	MEMORYSTATUS	lpBuffer;
 	static	char	cwd[1024];
+	LPWSTR		*wargv;
+	int		arg_num;
 	int		t;
 //	RECT		rect;
 
@@ -781,33 +782,50 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 
 	parms.basedir = cwd;
 
-	parms.argc = 1;
-	argv[0] = empty_string;
+	// We want to preserve spaces in the command-line arguments, which are not
+	// uncommon in path values for args (like -basedir value). A few ways we
+	// could do this:
+	// - Link with the VC++ runtime and use the generated __argc and __argv
+	//   variables.
+	// - Parse command line ourselves, using the standard Microsoft rules for
+	//   C/C++ programs.
+	// - Get the unicode command line with GetCommandLineW and parse it
+	//   with CommandLineToArgvW. But then we need convert everything to ANSI
+	//   to stay compatible with the rest of the engine.
 
-	while (*lpCmdLine && (parms.argc < MAX_NUM_ARGVS))
+	// Let's do that last one. So:
+
+	// Get the args in unicode.
+	wargv = CommandLineToArgvW(GetCommandLineW(), &(parms.argc));
+	// Cap argc at our internal max.
+	if (parms.argc > MAX_NUM_ARGVS)
+		parms.argc = MAX_NUM_ARGVS;
+	// Allocate space pointers to ANSI args.
+	parms.argv = Q_malloc(sizeof(char*) * parms.argc);
+	// First arg is always just empty-string.
+	parms.argv[0] = empty_string;
+	// Loop through remaining args and convert them to ANSI.
+	for (arg_num = 1; arg_num < parms.argc; arg_num++)
 	{
-		while (*lpCmdLine && ((*lpCmdLine <= 32) || (*lpCmdLine > 126)))
-			lpCmdLine++;
-
-		if (*lpCmdLine)
-		{
-			argv[parms.argc] = lpCmdLine;
-			parms.argc++;
-
-			while (*lpCmdLine && ((*lpCmdLine > 32) && (*lpCmdLine <= 126)))
-				lpCmdLine++;
-
-			if (*lpCmdLine)
-			{
-				*lpCmdLine = 0;
-				lpCmdLine++;
-			}
-		}
+		// Find the size for the ANSI arg.
+		int arg_size = WideCharToMultiByte(
+			CP_ACP, // ANSI
+			0, // no special handling of unmapped chars
+			wargv[arg_num], // arg to process
+			-1, // arg is null-terminated
+			NULL, 0, // no output yet, just calculating size
+			NULL, NULL); // use default for unrepresented char
+		// Allocate space for the ANSI arg.
+		parms.argv[arg_num] = Q_malloc(arg_size);
+		// Fill the ANSI arg.
+		WideCharToMultiByte(CP_ACP, 0, wargv[arg_num], -1,
+			parms.argv[arg_num], arg_size, NULL, NULL);
 	}
+	// Discard the unicode args.
+	LocalFree(wargv);
 
-	parms.argv = argv;
-
-	COM_InitArgv (parms.argc, parms.argv);
+	// Construct the "cmdline" console var and handle safe-mode switches.
+	COM_InitArgv (parms.argc, parms.argv, lpCmdLine);
 
 	parms.argc = com_argc;
 	parms.argv = com_argv;

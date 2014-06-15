@@ -914,28 +914,78 @@ void COM_CheckRegistered (void)
 COM_InitArgv
 ================
 */
-void COM_InitArgv (int argc, const char **argv)
+static char	*whitespace = " \t";
+
+void COM_InitArgv (int argc, const char **argv, const char *cmdline)
 {
+	int		i;
 	qboolean	safe;
-	int		i, j, n;
 
-// reconstitute the command line for the cmdline externally visible cvar
-	n = 0;
-
-	for (j=0 ; j<MAX_NUM_ARGVS && j<argc ; j++)
+	// If we have the original command line available, copy that to com_cmdline.
+	// Otherwise reconstitute it from argc/argv, using bash-like quoting
+	// conventions for quotes and backslashes. (These conventions are not
+	// accurate for Windows builds... which should pass in cmdline instead.)
+	if (cmdline != NULL)
 	{
-		i = 0;
-
-		while ((n < (CMDLINE_LENGTH - 1)) && argv[j][i])
-			com_cmdline[n++] = argv[j][i++];
-
-		if (n < (CMDLINE_LENGTH - 1))
-			com_cmdline[n++] = ' ';
-		else
-			break;
+		int chars_copied;
+		// The old convention for com_cmdline is that it starts with a space, and
+		// it ends with a space if there is enough room. Might as well preserve
+		// that behavior.
+		com_cmdline[0] = ' ';
+		chars_copied = Q_strncpy(com_cmdline + 1, CMDLINE_LENGTH - 1, cmdline, strlen(cmdline));
+		if (chars_copied < (CMDLINE_LENGTH - 2))
+			com_cmdline[chars_copied + 1] = ' ';
 	}
+	else
+	{
+		int		j, n;
+		qboolean	has_whitespace;
 
-	com_cmdline[n] = 0;
+		n = 0;
+
+		for (j=0 ; j<MAX_NUM_ARGVS && j<argc ; j++)
+		{
+			const char *arg = argv[j];
+			i = 0;
+
+			// See if we need to quote the arg.
+			if (strcspn(arg, whitespace) == strlen(arg))
+			{
+				has_whitespace = false;
+			}
+			else
+			{
+				has_whitespace = true;
+				if (n < (CMDLINE_LENGTH - 1))
+					com_cmdline[n++] = '"';
+			}
+
+			// Copy in the chars of the arg. Backslash any quote or backslash chars as
+			// necessary.
+			while ((n < (CMDLINE_LENGTH - 1)) && arg[i])
+			{
+				if ((arg[i] == '"') || ((!has_whitespace) && (arg[i] == '\\')))
+				{
+					com_cmdline[n++] = '\\';
+					if (n >= CMDLINE_LENGTH)
+						break;
+				}
+				com_cmdline[n++] = arg[i++];
+			}
+
+			// Finish quoting the arg if needed.
+			if (has_whitespace && (n < (CMDLINE_LENGTH - 1)))
+				com_cmdline[n++] = '"';
+
+			// Add a space for the next arg, or bail out when max length hit.
+			if (n < (CMDLINE_LENGTH - 1))
+				com_cmdline[n++] = ' ';
+			else
+				break;
+		}
+
+		com_cmdline[n] = 0;
+	}
 
 	safe = false;
 
