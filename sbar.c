@@ -1368,6 +1368,10 @@ void Sbar_DeathmatchOverlay (void)
 //	scr_copyeverything = 1;
 //	scr_fullupdate = 0;
 
+	// Abort if not fully signed on yet.
+	if (cls.signon != SIGNONS)
+		return;
+
 	xofs = (vid.width - 320) >> 1;
 
 #ifdef HEXEN2_SUPPORT
@@ -1438,6 +1442,10 @@ void Sbar_MiniDeathmatchOverlay (int sbarlines)
 	int		i, k, l, top, bottom, x, y, f, numlines;
 	char		num[12];
 	scoreboard_t	*s;
+
+	// Abort if not fully signed on yet.
+	if (cls.signon != SIGNONS)
+		return;
 
 	if (vid.width < 512 || !sbarlines)
 		return;
