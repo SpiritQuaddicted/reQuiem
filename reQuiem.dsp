@@ -54,9 +54,9 @@ BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib dxguid.lib opengl32.lib wsock32.lib winmm.lib libpng.lib zlib.lib /nologo /subsystem:windows /pdb:".\release_gl\reQuiem-gl.pdb" /machine:IX86 /pdbtype:sept /release
+# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib opengl32.lib wsock32.lib winmm.lib libpng.lib zlib.lib /nologo /subsystem:windows /pdb:".\release_gl\reQuiem-gl.pdb" /machine:IX86 /pdbtype:sept /release
 # SUBTRACT BASE LINK32 /pdb:none
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib dxguid.lib opengl32.lib wsock32.lib winmm.lib /nologo /subsystem:windows /machine:IX86 /out:"I:\Quake\Prog\reQuiem.exe" /pdbtype:sept /release
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib opengl32.lib wsock32.lib winmm.lib /nologo /subsystem:windows /machine:IX86 /out:"I:\Quake\Prog\reQuiem.exe" /pdbtype:sept /release
 # SUBTRACT LINK32 /pdb:none /nodefaultlib
 
 !ELSEIF  "$(CFG)" == "reQuiem - Win32 GL Debug"
@@ -83,9 +83,9 @@ BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo /o"DebugGL/reQuiem.bsc"
 LINK32=link.exe
-# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib dxguid.lib opengl32.lib wsock32.lib winmm.lib libpng.lib zlib.lib /nologo /subsystem:windows /pdb:".\release_gl\reQuiem-gl.pdb" /machine:IX86 /pdbtype:sept /release
+# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib opengl32.lib wsock32.lib winmm.lib libpng.lib zlib.lib /nologo /subsystem:windows /pdb:".\release_gl\reQuiem-gl.pdb" /machine:IX86 /pdbtype:sept /release
 # SUBTRACT BASE LINK32 /pdb:none
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib dxguid.lib opengl32.lib wsock32.lib winmm.lib /nologo /subsystem:windows /incremental:yes /pdb:"DebugGL\reQuiemd.pdb" /debug /machine:IX86 /nodefaultlib:"LIBC" /out:"DebugGL\reQuiemd.exe" /pdbtype:sept
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib opengl32.lib wsock32.lib winmm.lib /nologo /subsystem:windows /incremental:yes /pdb:"DebugGL\reQuiemd.pdb" /debug /machine:IX86 /nodefaultlib:"LIBC" /out:"DebugGL\reQuiemd.exe" /pdbtype:sept
 # SUBTRACT LINK32 /pdb:none /nodefaultlib
 
 !ELSEIF  "$(CFG)" == "reQuiem - Win32 GL Client Debug"
@@ -114,9 +114,9 @@ BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo /o"DebugGL/reQuiem.bsc"
 # ADD BSC32 /nologo /o"Client_Debug/reQuiem.bsc"
 LINK32=link.exe
-# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib dxguid.lib opengl32.lib wsock32.lib winmm.lib /nologo /subsystem:windows /incremental:yes /pdb:"DebugGL\reQuiemd.pdb" /debug /machine:IX86 /nodefaultlib:"LIBC" /out:"DebugGL\reQuiemd.exe" /pdbtype:sept
+# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib opengl32.lib wsock32.lib winmm.lib /nologo /subsystem:windows /incremental:yes /pdb:"DebugGL\reQuiemd.pdb" /debug /machine:IX86 /nodefaultlib:"LIBC" /out:"DebugGL\reQuiemd.exe" /pdbtype:sept
 # SUBTRACT BASE LINK32 /pdb:none /nodefaultlib
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib dxguid.lib opengl32.lib wsock32.lib winmm.lib /nologo /subsystem:windows /incremental:yes /pdb:"DebugGL\reQuiemd.pdb" /debug /machine:IX86 /nodefaultlib:"LIBC" /out:"DebugGL\reQuiemcl.exe" /pdbtype:sept
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib opengl32.lib wsock32.lib winmm.lib /nologo /subsystem:windows /incremental:yes /pdb:"DebugGL\reQuiemd.pdb" /debug /machine:IX86 /nodefaultlib:"LIBC" /out:"DebugGL\reQuiemcl.exe" /pdbtype:sept
 # SUBTRACT LINK32 /pdb:none /nodefaultlib
 
 !ELSEIF  "$(CFG)" == "reQuiem - Win32 Server Debug"
@@ -145,9 +145,9 @@ BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo /o"DebugGL/reQuiem.bsc"
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib dxguid.lib opengl32.lib wsock32.lib winmm.lib /nologo /subsystem:windows /incremental:yes /pdb:"DebugGL\reQuiemd.pdb" /debug /machine:IX86 /nodefaultlib:"LIBC" /out:"DebugGL\reQuiemd.exe" /pdbtype:sept
+# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib opengl32.lib wsock32.lib winmm.lib /nologo /subsystem:windows /incremental:yes /pdb:"DebugGL\reQuiemd.pdb" /debug /machine:IX86 /nodefaultlib:"LIBC" /out:"DebugGL\reQuiemd.exe" /pdbtype:sept
 # SUBTRACT BASE LINK32 /pdb:none /nodefaultlib
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib dxguid.lib wsock32.lib winmm.lib /nologo /subsystem:windows /incremental:yes /pdb:"Server_Debug\reQuiemd.pdb" /debug /machine:IX86 /nodefaultlib:"LIBC" /out:"Server_Debug\reQuiem_svd.exe" /pdbtype:sept
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib wsock32.lib winmm.lib /nologo /subsystem:windows /incremental:yes /pdb:"Server_Debug\reQuiemd.pdb" /debug /machine:IX86 /nodefaultlib:"LIBC" /out:"Server_Debug\reQuiem_svd.exe" /pdbtype:sept
 # SUBTRACT LINK32 /pdb:none /nodefaultlib
 
 !ENDIF 
