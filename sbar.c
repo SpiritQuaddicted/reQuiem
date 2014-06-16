@@ -1189,7 +1189,9 @@ void Sbar_Draw (void)
 	qboolean	headsup;	// joe
 	int			sbarlines;
 
-//	if (scr_con_current == vid.height)
+	if (scr_con_current == vid.height)
+		return;		// console is full screen
+
 	if (cls.state != ca_connected)
 		return;
 
