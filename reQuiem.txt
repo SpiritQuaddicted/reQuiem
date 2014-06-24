@@ -35,7 +35,7 @@ Included files:
   - water_caustic.png, explosion.png, particlefont.png, zing1.png, 
     q3blood.tga, q3smoke.tga, flame0.mdl
       - JoeQuake files for water caustics and QMB particles (optional)
-  - bigfont.lmp, fontsize.lmp: character set for menu
+  - bigfont.lmp, fontsize.lmp, menufont.lmp: character set for menu
   - demo_fw.lmp, demo_rw.lmp, demo_bar.lmp: icons overlaid during demo playback
 
   NOTE: libpng12 is required for PNG support.  libjpeg is required for JPEG support.
