@@ -1,0 +1,5 @@
+gas2masm.exe
+DebugGL/
+release_gl/
+Server_Debug/
+release_glx/
