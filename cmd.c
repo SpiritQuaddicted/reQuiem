@@ -403,6 +403,14 @@ void Cmd_Exec_f (cmd_source_t src)
 		if (!f)
 		{
 			Con_Printf ("couldn't exec %s\n", name);
+			// Normally requiem.cfg is executed after autoexec.cfg (see below). If
+			// this was an attempt to exec autoexec.cfg, set the "done that" flag
+			// and exec requiem.cfg now.
+			if (!Q_strcasecmp(p, "autoexec.cfg") && !id1_autoexec_done)
+			{
+				Cbuf_InsertText ("exec reQuiem.cfg\n", SRC_COMMAND);
+				id1_autoexec_done = true;
+			}
 			return;
 		}
 	}
