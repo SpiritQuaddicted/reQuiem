@@ -20,7 +20,6 @@
 					<Add option="-funsigned-char" />
 					<Add option="-I/usr/include" />
 					<Add option="-I/usr/X11R6/include" />
-					<Add option="-D__linux__" />
 					<Add option="-DGLQUAKE" />
 					<Add option="-D_DEBUG" />
 				</Compiler>
@@ -37,9 +36,9 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-march=i686" />
-					<Add option="-fomit-frame-pointer" />
-					<Add option="-fexpensive-optimizations" />
 					<Add option="-O3" />
+					<Add option="-Wall" />
+					<Add option="-fomit-frame-pointer" />
 					<Add option="-funsigned-char" />
 					<Add option="-funroll-loops" />
 					<Add option="-ffast-math" />
@@ -47,7 +46,6 @@
 					<Add option="-I/usr/include" />
 					<Add option="-I/usr/X11R6/include" />
 					<Add option="-m32" />
-					<Add option="-D__linux__" />
 					<Add option="-DNDEBUG" />
 					<Add option="-DGLQUAKE" />
 				</Compiler>
