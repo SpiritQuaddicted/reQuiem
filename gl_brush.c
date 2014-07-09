@@ -779,8 +779,28 @@ void CalcSurfaceExtents (model_t *mod, msurface_t *s)
 			if (v->position[j] > s->maxs[j])
 				s->maxs[j] = v->position[j];
 //#endif
-			val = v->position[0] * tex->vecs[j][0] + v->position[1] * tex->vecs[j][1] +
-					v->position[2] * tex->vecs[j][2] + tex->vecs[j][3];
+			// the following comment and definition of val are from
+			// http://sourceforge.net/p/quakespasm/code/908/
+			/* The following calculation is sensitive to floating-point
+			 * precision.  It needs to produce the same result that the
+			 * light compiler does, because R_BuildLightMap uses surf->
+			 * extents to know the width/height of a surface's lightmap,
+			 * and incorrect rounding here manifests itself as patches
+			 * of "corrupted" looking lightmaps.
+			 * Most light compilers are win32 executables, so they use
+			 * x87 floating point.  This means the multiplies and adds
+			 * are done at 80-bit precision, and the result is rounded
+			 * down to 32-bits and stored in val.
+			 * Adding the casts to double seems to be good enough to fix
+			 * lighting glitches when Quakespasm is compiled as x86_64
+			 * and using SSE2 floating-point.  A potential trouble spot
+			 * is the hallway at the beginning of mfxsp17.  -- ericw
+			 */
+			val =	((double)v->position[0] * (double)tex->vecs[j][0]) +
+				((double)v->position[1] * (double)tex->vecs[j][1]) +
+				((double)v->position[2] * (double)tex->vecs[j][2]) +
+				(double)tex->vecs[j][3];
+				
 			if (val < mins[j])
 				mins[j] = val;
 			if (val > maxs[j])
@@ -1372,7 +1392,7 @@ void Mod_MakeHull0 (void)
 
 	in = loadmodel->nodes;
 	count = loadmodel->numnodes;
-	out = Hunk_AllocName (count * sizeof(*out), mod_loadname);
+	out = Hunk_AllocName (ccontents ount * sizeof(*out), mod_loadname);
 
 	hull->clipnodes = out;
 	hull->firstclipnode = 0;
