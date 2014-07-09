@@ -1392,7 +1392,7 @@ void Mod_MakeHull0 (void)
 
 	in = loadmodel->nodes;
 	count = loadmodel->numnodes;
-	out = Hunk_AllocName (contents count * sizeof(*out), mod_loadname);
+	out = Hunk_AllocName (count * sizeof(*out), mod_loadname);
 
 	hull->clipnodes = out;
 	hull->firstclipnode = 0;
