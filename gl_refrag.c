@@ -23,6 +23,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #ifndef RQM_SV_ONLY
 
+extern qboolean	scr_update_in_frame;
+
 mnode_t	*r_pefragtopnode;
 
 
@@ -211,7 +213,7 @@ void R_StoreEfrags (efrag_t **ppefrag)
 		case mod_md3:
 		case mod_brush:
 		case mod_sprite:
-			if (pent->visframe != r_framecount)
+			if (scr_update_in_frame && pent->visframe != r_framecount)
 			{
 				if (cl_numvisedicts < MAX_VISEDICTS)
 					cl_visedicts[cl_numvisedicts++] = pent;

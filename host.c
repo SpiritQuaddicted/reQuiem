@@ -40,6 +40,7 @@ Memory is cleared / released when a server or client begins, not when they end.
 quakeparms_t	host_parms;
 
 qboolean	host_initialized;		// true if into command execution
+qboolean	scr_update_in_frame;		// true while calling SCR_UpdateScreen from _Host_Frame
 
 double		host_frametime;
 double		host_time;
@@ -839,7 +840,9 @@ void _Host_Frame (double time)
 		time1 = Sys_DoubleTime ();
 
 	// update video
+	scr_update_in_frame = true;
 	SCR_UpdateScreen ();
+	scr_update_in_frame = false;
 
 	if (host_speeds.value)
 		time2 = Sys_DoubleTime ();
