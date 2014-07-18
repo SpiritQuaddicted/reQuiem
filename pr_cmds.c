@@ -2144,7 +2144,7 @@ void PF_makestatic (void)
 	MSG_WriteSpawnstatic (&sv.signon, ent);
 
 // JDH: if there's a local client running, send it a message
-	if (svs.clients[0].spawned && svs.clients[0].netconnection && !svs.clients[0].netconnection->socket)
+	if (allow_postcache && svs.clients[0].spawned && svs.clients[0].netconnection && !svs.clients[0].netconnection->socket)
 		MSG_WriteSpawnstatic (&svs.clients[0].message, ent);
 
 // throw the entity away now
