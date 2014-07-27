@@ -1592,7 +1592,7 @@ void Draw_Crosshair (void)
 	byte		col[4];
 	extern vrect_t	scr_vrect;
 
-	if (cls.demoplayback || !gl_crosshairalpha.value)
+	if (!gl_crosshairalpha.value)
 		return;
 
 //	if ((crosshair.value >= 2 && crosshair.value <= NUMCROSSHAIRS + 1) || crosshairimage_loaded)
