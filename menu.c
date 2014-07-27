@@ -3771,10 +3771,11 @@ qboolean M_Keys_Key (int k, qboolean down)
 		if (k != K_ESCAPE)
 		{
 			S_LocalSound (gMenuSounds[0]);
-		//	if (k == '`')
-		//		return true;
 
-			if (keycmds == keycmds_other)
+			// Lock out some keys from being bound from the "Other Controls"
+			// menu (except for the toggleconsole binding).
+			cmdname = keycmds[menu_current->cursor].cmd;
+			if ((keycmds == keycmds_other) && Q_strcasecmp(cmdname, "toggleconsole"))
 			{
 				if (k & 0xFFFFFF00)
 				{
@@ -3791,7 +3792,6 @@ qboolean M_Keys_Key (int k, qboolean down)
 				}
 			}
 
-			cmdname = keycmds[menu_current->cursor].cmd;
 			M_FindKeysForCommand (cmdname, keys);
 			if (keys[1] != -1)
 				M_UnbindCommand (cmdname);
