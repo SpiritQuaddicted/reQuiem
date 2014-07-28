@@ -39,18 +39,12 @@ RM_DIRS = rm -fr $(_DIRS)
 $(GLX_DIR):
 	$(MKDIR)
 
-#CPU_OPT = -march=pentium3 -msse -mfpmath=sse
-#CPU_OPT = -march=pentium
-CPU_OPT = -march=pentiumpro
+CPU_OPT = -march=pentium
 CFLAGS += $(CPU_OPT)
-#CFLAGS += -Did386
 CFLAGS += -O3 -Wall -DNDEBUG -fomit-frame-pointer
-CFLAGS += -ffast-math
-CFLAGS += -funsigned-char
-CFLAGS += -funroll-loops
-CFLAGS += -fno-strength-reduce
+CFLAGS += -m32
 
-LDFLAGS := -lm
+LDFLAGS := -lm -ldl -m32
 
 #######
 # GLX #
