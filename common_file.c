@@ -1695,10 +1695,21 @@ COM_AddDzip
 */
 int COM_AddDzip (com_fileinfo_t *file, int count, unsigned int param)
 {
+	return COM_AddDzipByName (file->name);
+}
+
+/*
+================
+COM_AddDzipByName
+- used by callback above, and also when adding newly created dzip
+================
+*/
+int COM_AddDzipByName (char *name)
+{
 	char	filepath[MAX_OSPATH];
 	pack_t	*pak;
 
-	Q_snprintfz (filepath, sizeof(filepath), "%s/%s", com_gamedir, file->name);
+	Q_snprintfz (filepath, sizeof(filepath), "%s/%s", com_gamedir, name);
 
 	pak = Dzip_LoadFileList (filepath);
 	if (pak)

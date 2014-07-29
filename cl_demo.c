@@ -1298,7 +1298,7 @@ void DZCompressError (void)
 	dz_app_op = DZ_OP_NONE;
 }
 
-void DZCompressFinish (void)
+void DZCompressFinish (const char *dzname)
 {
 	char	dempath[MAX_OSPATH];
 
@@ -1306,6 +1306,9 @@ void DZCompressFinish (void)
 
 	Q_snprintfz (dempath, sizeof(dempath), "%s/%s", com_gamedir, cl_demo_filepath);
 	remove (dempath);
+	// If .dz file, and dzlib_loaded, then should be added to searchpaths.
+	if (dzlib_loaded && !Q_strcasecmp(COM_FileExtension (dzname), "dz"))
+		COM_AddDzipByName (dzname);
 	Con_Print ("Done!\n");
 }
 
@@ -1329,7 +1332,7 @@ static qboolean CL_VerifyCompressedDemo (const char *dzname)
 		dz_app_op = DZ_OP_NONE;		// in case compression step was done by dz app
 		if (Dzip_Verify (dzpath))
 		{
-			DZCompressFinish ();
+			DZCompressFinish (dzname);
 			return true;
 		}
 		remove (dzpath);
@@ -1445,7 +1448,7 @@ DOCOMPRESS:
 				if (!DZWaitForApp () || (dz_exitcode != DZ_APP_NOERR))
 					goto ERROR_EXIT;
 
-				DZCompressFinish ();
+				DZCompressFinish (dz_filename);
 				dz_app_op = DZ_OP_NONE;
 			}
 		}
@@ -1951,7 +1954,7 @@ static void CheckDZipCompletion (void)
 		if (dz_exitcode == DZ_APP_NOERR)
 		{
 			dz_app_op = DZ_OP_NONE;
-			DZCompressFinish ();
+			DZCompressFinish (dz_filename);
 			return;
 		}
 	}
