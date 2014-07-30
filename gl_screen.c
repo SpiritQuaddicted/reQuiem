@@ -97,6 +97,7 @@ qboolean	OnChange_screenvar (cvar_t *var, const char *value);
 
 cvar_t		scr_viewsize     = {"viewsize",         "100", CVAR_FLAG_ARCHIVE, OnChange_screenvar};
 cvar_t		scr_fov          = {"fov",               "90", CVAR_FLAG_ARCHIVE, OnChange_screenvar};	// 10 - 170
+cvar_t		scr_fov_adapt    = {"fov_adapt",          "1", CVAR_FLAG_ARCHIVE, OnChange_screenvar};
 cvar_t		scr_consize      = {"scr_consize",      "0.8", CVAR_FLAG_ARCHIVE};		// by joe (JDH: changed default from 0.5)
 cvar_t		scr_conspeed     = {"scr_conspeed",     "600", CVAR_FLAG_ARCHIVE};		// JDH: changed default from 1000
 cvar_t		scr_centertime   = {"scr_centertime",     "2", CVAR_FLAG_ARCHIVE};
@@ -193,6 +194,7 @@ SCR_Init
 void SCR_Init (void)
 {
 	Cvar_RegisterInt (&scr_fov, 10, 170);
+	Cvar_RegisterInt (&scr_fov_adapt, 0, 1);
 	Cvar_RegisterInt (&scr_viewsize, 30, 120);
 	Cvar_RegisterFloat (&scr_consize, 0, 1);	// by joe
 	Cvar_RegisterInt (&scr_conspeed, 100, CVAR_UNKNOWN_MAX);
@@ -237,7 +239,7 @@ void SCR_Init (void)
 /*
 =====================
 OnChange_screenvar
-  (viewsize, fov, cl_sbar)
+  (viewsize, fov, fov_adapt, cl_sbar)
 =====================
 */
 qboolean OnChange_screenvar (cvar_t *var, const char *value)
@@ -753,21 +755,20 @@ void UpdateInfoMessage (void)
 /*
 ====================
 CalcFov
+
+Given an FOV value for a reference dimension, calculate the FOV value for
+another dimension that would preserve the subtended angles of objects. 
 ====================
 */
-float CalcFov (float fov_x, float width, float height)
+float CalcFov (float fov_ref, float dim_ref, float dim_other)
 {
-        float   a, x;
+        float   a;
 
-        if (fov_x < 1 || fov_x > 179)
-                Sys_Error ("Bad fov: %f", fov_x);
+        if (fov_ref < 1 || fov_ref > 179)
+                Sys_Error ("Bad fov: %f", fov_ref);
 
-        x = width / tan(fov_x / 360 * M_PI);
-
-        a = atan(height / x);
-
+        a = atan(dim_other / dim_ref * tan(fov_ref / 360 * M_PI));
         a = a * 360 / M_PI;
-
         return a;
 }
 
@@ -863,8 +864,25 @@ static void SCR_CalcRefdef (void)
 //		r_refdef.vrect.y = (vid.height - sb_lines - r_refdef.vrect.height) / 2;
 		r_refdef.vrect.y = (vid.height - sbar_height - r_refdef.vrect.height) / 2;
 
-	r_refdef.fov_x = scr_fov.value;
-	r_refdef.fov_y = CalcFov (r_refdef.fov_x, r_refdef.vrect.width, r_refdef.vrect.height);
+	if (scr_fov_adapt.value)
+	{
+		// "auto" FOV: treat fov value as horizontal FOV for 4:3 aspect ratio
+		// 1) Find what the width dimension would be for the current height,
+		//    if the aspect ratio were 4:3.
+		float width_4_3 = r_refdef.vrect.height * 4.0 / 3.0;
+		// 2) Calculate vertical FOV from the fov value and the "4:3 width".
+		r_refdef.fov_y = CalcFov (scr_fov.value, width_4_3, r_refdef.vrect.height);
+		// 3) Calculate actual horizontal FOV from vertical FOV.
+		r_refdef.fov_x = CalcFov (r_refdef.fov_y, r_refdef.vrect.height, r_refdef.vrect.width);	
+	}
+	else
+	{
+		// "manual" FOV: treat fov value as horizontal FOV.
+		// 1) Calculate vertical FOV from the fov value and the width.
+		r_refdef.fov_y = CalcFov (scr_fov.value, r_refdef.vrect.width, r_refdef.vrect.height);
+		// 2) Set horizontal FOV directly.
+		r_refdef.fov_x = scr_fov.value;
+	}
 
 	scr_vrect = r_refdef.vrect;
 }
