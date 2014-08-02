@@ -867,22 +867,19 @@ static void SCR_CalcRefdef (void)
 	if (scr_fov_adapt.value)
 	{
 		// "auto" FOV: treat fov value as horizontal FOV for 4:3 aspect ratio
-		// 1) Find what the width dimension would be for the current height,
-		//    if the aspect ratio were 4:3.
-		float width_4_3 = r_refdef.vrect.height * 4.0 / 3.0;
-		// 2) Calculate vertical FOV from the fov value and the "4:3 width".
-		r_refdef.fov_y = CalcFov (scr_fov.value, width_4_3, r_refdef.vrect.height);
-		// 3) Calculate actual horizontal FOV from vertical FOV.
-		r_refdef.fov_x = CalcFov (r_refdef.fov_y, r_refdef.vrect.height, r_refdef.vrect.width);	
+		// Find what the screen width dimension would be for the current screen
+		// height, if the screen aspect ratio were 4:3. Assuming scr_fov.value is
+		// the FOV at that width, then find the appropriate FOV for the current
+		// screen width. Use that for the viewport's horizontal FOV.
+		r_refdef.fov_x = CalcFov (scr_fov.value, vid.height * 4.0 / 3.0, vid.width);
 	}
 	else
 	{
-		// "manual" FOV: treat fov value as horizontal FOV.
-		// 1) Calculate vertical FOV from the fov value and the width.
-		r_refdef.fov_y = CalcFov (scr_fov.value, r_refdef.vrect.width, r_refdef.vrect.height);
-		// 2) Set horizontal FOV directly.
+		// "manual" FOV: treat fov value as the viewport's horizontal FOV.
 		r_refdef.fov_x = scr_fov.value;
 	}
+	// Always derive the viewport's vertical FOV from its horizontal FOV.
+	r_refdef.fov_y = CalcFov (r_refdef.fov_x, r_refdef.vrect.width, r_refdef.vrect.height);
 
 	scr_vrect = r_refdef.vrect;
 }
