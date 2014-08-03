@@ -49,7 +49,7 @@ extern	cvar_t	vid_vsync, host_maxfps, scr_sshot_format, jpeg_compression_level, 
 extern	cvar_t	gl_texturemode, gl_texbrighten, gl_zfightfix, r_oldsky, r_flatlightstyles, r_modelbrightness, gl_glows, r_powerupglow;
 extern	cvar_t	nosound, sv_entpatch, sv_altnoclip;
 extern	cvar_t	scr_consize, scr_conspeed, gl_conalpha, con_linespacing, con_logcenterprint, gl_consolefont, gl_smoothfont;
-extern	cvar_t	scr_centersbar, scr_sbarsize, scr_hudscale, scr_notifscale, scr_showspeed, scr_showorigin, scr_showfps, con_notifytime, _con_notifylines, con_autocomplete;
+extern	cvar_t	scr_centersbar, scr_sbarsize, scr_hudscale, scr_notifyscale, scr_showspeed, scr_showorigin, scr_showfps, con_notifytime, _con_notifylines, con_autocomplete;
 extern	cvar_t	crosshair, crosshairsize, gl_crosshairalpha, crosshaircolor, gl_crosshairimage, cl_crossx, cl_crossy;
 extern	cvar_t	com_matchfilecase, sv_protocol, host_cutscenehack, sv_fishfix, sv_imp12hack, nospr32;
 extern	cvar_t	v_gunkick, cl_deadbodyfilter, cl_gibfilter, cl_demo_compress, cl_demo_compress_fmt;
@@ -453,7 +453,7 @@ menu_t menu_hud =
 		{           "Weapon size", NULL, &r_viewmodelsize, M_ITEM_SLIDER},
 		{                      "", NULL, NULL, M_ITEM_DISABLED},
 		{        "HUD text scale", NULL, &scr_hudscale, M_ITEM_SLIDER},
-		{     "Notify text scale", NULL, &scr_notifscale, M_ITEM_SLIDER},
+		{     "Notify text scale", NULL, &scr_notifyscale, M_ITEM_SLIDER},
 		{     "Show player speed", NULL, &scr_showspeed},
 		{       "Show player pos", NULL, &scr_showorigin},
 		{              "Show FPS", NULL, &scr_showfps},
@@ -2457,7 +2457,7 @@ void M_AdjustSliders (menu_t *menu, int dir, int key)
 		newval = bound (var->minvalue, newval, var->maxvalue);
 		Cvar_SetValueDirect (var, newval);
 	}
-	else if ((var == &scr_hudscale) || (var == &scr_notifscale))
+	else if ((var == &scr_hudscale) || (var == &scr_notifyscale))
 	{
 		newval = var->value + 0.25*dir;
 		newval = bound (var->minvalue, newval, var->maxvalue);
