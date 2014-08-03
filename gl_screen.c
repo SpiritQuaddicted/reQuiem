@@ -123,6 +123,7 @@ cvar_t		scr_printstats_length = {"scr_printstats_length", "0.5"};
 cvar_t		cl_sbar          = {"cl_sbar",            "0", CVAR_FLAG_ARCHIVE, OnChange_screenvar};
 cvar_t		scr_sbarsize     = {"scr_sbarsize",       "0", CVAR_FLAG_ARCHIVE, OnChange_screenvar};		// JDH
 cvar_t		scr_hudscale     = {"scr_hudscale",       "1", CVAR_FLAG_ARCHIVE};		// JDH
+cvar_t		scr_notifscale   = {"scr_notifscale",     "1", CVAR_FLAG_ARCHIVE};
 cvar_t		scr_menusize     = {"scr_menusize",       "0", CVAR_FLAG_ARCHIVE};			// JDH
 cvar_t		scr_centermenu   = {"scr_centermenu",     "1", CVAR_FLAG_ARCHIVE};
 
@@ -220,6 +221,7 @@ void SCR_Init (void)
 	Cvar_RegisterBool (&cl_sbar);		// by joe
 	Cvar_RegisterFloat (&scr_sbarsize, 0, 100);
 	Cvar_RegisterFloat (&scr_hudscale, 1, 3);		// JDH (range is somewhat arbitrary, used by menu only)
+	Cvar_RegisterFloat (&scr_notifscale, 1, 3);
 	Cvar_RegisterBool (&scr_centermenu);
 	Cvar_RegisterFloat (&scr_menusize, 0, 100);
 
@@ -2031,12 +2033,11 @@ void SCR_IntermissionOverlay_H2 (void)
 }
 #endif	// #ifdef HEXEN2_SUPPORT
 
-
-void SCR_SetHUDScale (qboolean enable)
+__inline static void SCR_SetScale (qboolean enable, float scale)
 {
 	static unsigned orig_vidwidth, orig_vidheight;
 
-	if ((scr_hudscale.value == 1.0) || (scr_hudscale.value <= 0))
+	if ((scale == 1.0) || (scale <= 0))
 		return;
 
 	assert (!!orig_vidwidth != enable);
@@ -2045,8 +2046,8 @@ void SCR_SetHUDScale (qboolean enable)
 	{
 		orig_vidwidth = vid.width;
 		orig_vidheight = vid.height;
-		vid.width = ceil(vid.width / scr_hudscale.value);
-		vid.height = ceil(vid.height / scr_hudscale.value);
+		vid.width = ceil(vid.width / scale);
+		vid.height = ceil(vid.height / scale);
 		glMatrixMode (GL_PROJECTION);
 		glLoadIdentity ();
 		glOrtho (0, vid.width, vid.height, 0, -99999, 99999);
@@ -2061,6 +2062,16 @@ void SCR_SetHUDScale (qboolean enable)
 		vid.height = orig_vidheight;
 		orig_vidwidth = orig_vidheight = 0;
 	}
+}
+
+void SCR_SetHUDScale (qboolean enable)
+{
+	SCR_SetScale (enable, scr_hudscale.value);
+}
+
+void SCR_SetNotifScale (qboolean enable)
+{
+	SCR_SetScale (enable, scr_notifscale.value);
 }
 
 /*
@@ -2081,9 +2092,9 @@ void SCR_DrawConsole (void)
 		// only draw notify in game
 		if (key_dest == key_game || key_dest == key_message)
 		{
-			SCR_SetHUDScale (true);
+			SCR_SetNotifScale (true);
 			Con_DrawNotify ();
-			SCR_SetHUDScale (false);
+			SCR_SetNotifScale (false);
 		}
 	}
 }
