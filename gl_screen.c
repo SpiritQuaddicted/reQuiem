@@ -2033,45 +2033,42 @@ void SCR_IntermissionOverlay_H2 (void)
 }
 #endif	// #ifdef HEXEN2_SUPPORT
 
-__inline static void SCR_SetScale (qboolean enable, float scale)
-{
-	static unsigned orig_vidwidth, orig_vidheight;
+float active_scale = 1.0;
+unsigned orig_vidwidth = 0;
+unsigned orig_vidheight = 0;
 
+void SCR_SetScale (float scale)
+{
 	if ((scale == 1.0) || (scale <= 0))
 		return;
 
-	assert (!!orig_vidwidth != enable);
-	
-	if (enable)
-	{
-		orig_vidwidth = vid.width;
-		orig_vidheight = vid.height;
-		vid.width = ceil(vid.width / scale);
-		vid.height = ceil(vid.height / scale);
-		glMatrixMode (GL_PROJECTION);
-		glLoadIdentity ();
-		glOrtho (0, vid.width, vid.height, 0, -99999, 99999);
-	}
-	else
-	{
-		// restore standard projection
-		glMatrixMode (GL_PROJECTION);
-		glLoadIdentity ();
-		glOrtho (0, orig_vidwidth, orig_vidheight, 0, -99999, 99999);
-		vid.width = orig_vidwidth;
-		vid.height = orig_vidheight;
-		orig_vidwidth = orig_vidheight = 0;
-	}
+	assert (orig_vidwidth == 0);
+
+	active_scale = scale;
+	orig_vidwidth = vid.width;
+	orig_vidheight = vid.height;
+	vid.width = ceil(vid.width / scale);
+	vid.height = ceil(vid.height / scale);
+	glMatrixMode (GL_PROJECTION);
+	glLoadIdentity ();
+	glOrtho (0, vid.width, vid.height, 0, -99999, 99999);
 }
 
-void SCR_SetHUDScale (qboolean enable)
+void SCR_UnsetScale ()
 {
-	SCR_SetScale (enable, scr_hudscale.value);
-}
+	if (active_scale == 1.0)
+		return;
 
-void SCR_SetNotifyScale (qboolean enable)
-{
-	SCR_SetScale (enable, scr_notifyscale.value);
+	assert (orig_vidwidth != 0);
+
+	// restore standard projection
+	glMatrixMode (GL_PROJECTION);
+	glLoadIdentity ();
+	glOrtho (0, orig_vidwidth, orig_vidheight, 0, -99999, 99999);
+	vid.width = orig_vidwidth;
+	vid.height = orig_vidheight;
+	active_scale = 1.0;
+	orig_vidwidth = orig_vidheight = 0;
 }
 
 /*
@@ -2092,9 +2089,9 @@ void SCR_DrawConsole (void)
 		// only draw notify in game
 		if (key_dest == key_game || key_dest == key_message)
 		{
-			SCR_SetNotifyScale (true);
+			SCR_SetScale (scr_notifyscale.value);
 			Con_DrawNotify ();
-			SCR_SetNotifyScale (false);
+			SCR_UnsetScale ();
 		}
 	}
 }
@@ -2211,9 +2208,9 @@ void SCR_UpdateScreen (void)
 	{
 		Sbar_Draw ();
 		Draw_DimScreen ();
-		SCR_SetHUDScale (true);
+		SCR_SetScale (scr_hudscale.value);
 		SCR_DrawNotifyString ();
-		SCR_SetHUDScale (false);
+		SCR_UnsetScale ();
 //		scr_copyeverything = true;
 	}
 	else*/ if (scr_drawloading)
@@ -2252,9 +2249,9 @@ void SCR_UpdateScreen (void)
 		else
 	#endif
 		{
-			SCR_SetHUDScale (true);
+			SCR_SetScale (scr_hudscale.value);
 			SCR_CheckDrawCenterString ();
-			SCR_SetHUDScale (false);
+			SCR_UnsetScale ();
 		}
 	}
 	else
@@ -2277,12 +2274,12 @@ void SCR_UpdateScreen (void)
 		if (hexen2 && intro_playing)
 		{
 			SCR_CheckDrawCenterString ();
-			SCR_SetHUDScale (true);
+			SCR_SetScale (scr_hudscale.value);
 		}
 		else
 	#endif
 		{
-			SCR_SetHUDScale (true);
+			SCR_SetScale (scr_hudscale.value);
 			SCR_CheckDrawCenterString ();
 		}
 
@@ -2297,7 +2294,7 @@ void SCR_UpdateScreen (void)
 			SCR_DrawDemoOverlay ();
 		}
 
-		SCR_SetHUDScale (false);
+		SCR_UnsetScale ();
 
 	#ifdef HEXEN2_SUPPORT
 		if (hexen2)
@@ -2329,9 +2326,9 @@ void SCR_UpdateScreen (void)
 	if (scr_drawdialog && scr_notifystring)
 	{
 		Draw_DimScreen ();
-		SCR_SetHUDScale (true);
+		SCR_SetScale (scr_hudscale.value);
 		SCR_DrawNotifyString ();
-		SCR_SetHUDScale (false);
+		SCR_UnsetScale ();
 //		scr_copyeverything = true;
 	}
 
