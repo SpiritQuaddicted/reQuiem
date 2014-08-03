@@ -123,6 +123,7 @@ cvar_t		scr_printstats_length = {"scr_printstats_length", "0.5"};
 cvar_t		cl_sbar          = {"cl_sbar",            "0", CVAR_FLAG_ARCHIVE, OnChange_screenvar};
 cvar_t		scr_sbarsize     = {"scr_sbarsize",       "0", CVAR_FLAG_ARCHIVE, OnChange_screenvar};		// JDH
 cvar_t		scr_hudscale     = {"scr_hudscale",       "1", CVAR_FLAG_ARCHIVE};		// JDH
+cvar_t		scr_notifyscale  = {"scr_notifyscale",    "1", CVAR_FLAG_ARCHIVE};
 cvar_t		scr_menusize     = {"scr_menusize",       "0", CVAR_FLAG_ARCHIVE};			// JDH
 cvar_t		scr_centermenu   = {"scr_centermenu",     "1", CVAR_FLAG_ARCHIVE};
 
@@ -220,6 +221,7 @@ void SCR_Init (void)
 	Cvar_RegisterBool (&cl_sbar);		// by joe
 	Cvar_RegisterFloat (&scr_sbarsize, 0, 100);
 	Cvar_RegisterFloat (&scr_hudscale, 1, 3);		// JDH (range is somewhat arbitrary, used by menu only)
+	Cvar_RegisterFloat (&scr_notifyscale, 1, 3);
 	Cvar_RegisterBool (&scr_centermenu);
 	Cvar_RegisterFloat (&scr_menusize, 0, 100);
 
@@ -1252,26 +1254,6 @@ void SCR_SetUpToDrawConsole (void)
 		con_notifylines = 0;
 }
 
-/*
-==================
-SCR_DrawConsole
-==================
-*/
-void SCR_DrawConsole (void)
-{
-	if (scr_con_current)
-	{
-//		scr_copyeverything = 1;
-		Con_DrawConsole (scr_con_current, (!scr_drawdialog || scr_notifystring));
-		clearconsole = 0;
-	}
-	else
-	{
-		if (key_dest == key_game || key_dest == key_message)
-			Con_DrawNotify ();	// only draw notify in game
-	}
-}
-
 static const char *time_formats[] =
 {
 	"%I:%M:%S %p",			// eg. 08:25:07 PM
@@ -2051,35 +2033,66 @@ void SCR_IntermissionOverlay_H2 (void)
 }
 #endif	// #ifdef HEXEN2_SUPPORT
 
+float active_scale = 1.0;
+unsigned orig_vidwidth = 0;
+unsigned orig_vidheight = 0;
 
-void SCR_SetHUDScale (qboolean enable)
+void SCR_SetScale (float scale)
 {
-	static unsigned orig_vidwidth, orig_vidheight;
-
-	if ((scr_hudscale.value == 1.0) || (scr_hudscale.value <= 0))
+	if ((scale == 1.0) || (scale <= 0))
 		return;
 
-	assert (!!orig_vidwidth != enable);
-	
-	if (enable)
+	assert (orig_vidwidth == 0);
+
+	active_scale = scale;
+	orig_vidwidth = vid.width;
+	orig_vidheight = vid.height;
+	vid.width = ceil(vid.width / scale);
+	vid.height = ceil(vid.height / scale);
+	glMatrixMode (GL_PROJECTION);
+	glLoadIdentity ();
+	glOrtho (0, vid.width, vid.height, 0, -99999, 99999);
+}
+
+void SCR_UnsetScale ()
+{
+	if (active_scale == 1.0)
+		return;
+
+	assert (orig_vidwidth != 0);
+
+	// restore standard projection
+	glMatrixMode (GL_PROJECTION);
+	glLoadIdentity ();
+	glOrtho (0, orig_vidwidth, orig_vidheight, 0, -99999, 99999);
+	vid.width = orig_vidwidth;
+	vid.height = orig_vidheight;
+	active_scale = 1.0;
+	orig_vidwidth = orig_vidheight = 0;
+}
+
+/*
+==================
+SCR_DrawConsole
+==================
+*/
+void SCR_DrawConsole (void)
+{
+	if (scr_con_current)
 	{
-		orig_vidwidth = vid.width;
-		orig_vidheight = vid.height;
-		vid.width = ceil(vid.width / scr_hudscale.value);
-		vid.height = ceil(vid.height / scr_hudscale.value);
-		glMatrixMode (GL_PROJECTION);
-		glLoadIdentity ();
-		glOrtho (0, vid.width, vid.height, 0, -99999, 99999);
+//		scr_copyeverything = 1;
+		Con_DrawConsole (scr_con_current, (!scr_drawdialog || scr_notifystring));
+		clearconsole = 0;
 	}
 	else
 	{
-		// restore standard projection
-		glMatrixMode (GL_PROJECTION);
-		glLoadIdentity ();
-		glOrtho (0, orig_vidwidth, orig_vidheight, 0, -99999, 99999);
-		vid.width = orig_vidwidth;
-		vid.height = orig_vidheight;
-		orig_vidwidth = orig_vidheight = 0;
+		// only draw notify in game
+		if (key_dest == key_game || key_dest == key_message)
+		{
+			SCR_SetScale (scr_notifyscale.value);
+			Con_DrawNotify ();
+			SCR_UnsetScale ();
+		}
 	}
 }
 
@@ -2195,9 +2208,9 @@ void SCR_UpdateScreen (void)
 	{
 		Sbar_Draw ();
 		Draw_DimScreen ();
-		SCR_SetHUDScale (true);
+		SCR_SetScale (scr_hudscale.value);
 		SCR_DrawNotifyString ();
-		SCR_SetHUDScale (false);
+		SCR_UnsetScale ();
 //		scr_copyeverything = true;
 	}
 	else*/ if (scr_drawloading)
@@ -2236,9 +2249,9 @@ void SCR_UpdateScreen (void)
 		else
 	#endif
 		{
-			SCR_SetHUDScale (true);
+			SCR_SetScale (scr_hudscale.value);
 			SCR_CheckDrawCenterString ();
-			SCR_SetHUDScale (false);
+			SCR_UnsetScale ();
 		}
 	}
 	else
@@ -2261,12 +2274,12 @@ void SCR_UpdateScreen (void)
 		if (hexen2 && intro_playing)
 		{
 			SCR_CheckDrawCenterString ();
-			SCR_SetHUDScale (true);
+			SCR_SetScale (scr_hudscale.value);
 		}
 		else
 	#endif
 		{
-			SCR_SetHUDScale (true);
+			SCR_SetScale (scr_hudscale.value);
 			SCR_CheckDrawCenterString ();
 		}
 
@@ -2281,7 +2294,7 @@ void SCR_UpdateScreen (void)
 			SCR_DrawDemoOverlay ();
 		}
 
-		SCR_SetHUDScale (false);
+		SCR_UnsetScale ();
 
 	#ifdef HEXEN2_SUPPORT
 		if (hexen2)
@@ -2313,9 +2326,9 @@ void SCR_UpdateScreen (void)
 	if (scr_drawdialog && scr_notifystring)
 	{
 		Draw_DimScreen ();
-		SCR_SetHUDScale (true);
+		SCR_SetScale (scr_hudscale.value);
 		SCR_DrawNotifyString ();
-		SCR_SetHUDScale (false);
+		SCR_UnsetScale ();
 //		scr_copyeverything = true;
 	}
 
