@@ -1252,26 +1252,6 @@ void SCR_SetUpToDrawConsole (void)
 		con_notifylines = 0;
 }
 
-/*
-==================
-SCR_DrawConsole
-==================
-*/
-void SCR_DrawConsole (void)
-{
-	if (scr_con_current)
-	{
-//		scr_copyeverything = 1;
-		Con_DrawConsole (scr_con_current, (!scr_drawdialog || scr_notifystring));
-		clearconsole = 0;
-	}
-	else
-	{
-		if (key_dest == key_game || key_dest == key_message)
-			Con_DrawNotify ();	// only draw notify in game
-	}
-}
-
 static const char *time_formats[] =
 {
 	"%I:%M:%S %p",			// eg. 08:25:07 PM
@@ -2080,6 +2060,31 @@ void SCR_SetHUDScale (qboolean enable)
 		vid.width = orig_vidwidth;
 		vid.height = orig_vidheight;
 		orig_vidwidth = orig_vidheight = 0;
+	}
+}
+
+/*
+==================
+SCR_DrawConsole
+==================
+*/
+void SCR_DrawConsole (void)
+{
+	if (scr_con_current)
+	{
+//		scr_copyeverything = 1;
+		Con_DrawConsole (scr_con_current, (!scr_drawdialog || scr_notifystring));
+		clearconsole = 0;
+	}
+	else
+	{
+		// only draw notify in game
+		if (key_dest == key_game || key_dest == key_message)
+		{
+			SCR_SetHUDScale (true);
+			Con_DrawNotify ();
+			SCR_SetHUDScale (false);
+		}
 	}
 }
 
