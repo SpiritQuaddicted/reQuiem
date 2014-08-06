@@ -814,7 +814,7 @@ qboolean OnChange_gl_crosshairimage (cvar_t *var, const char *string)
 	namelist[0] = string;
 	namelist[1] = NULL;
 
-	if (!(pic = GL_LoadPicImage_MultiSource (crosshair_pathlist, namelist, "crosshair", TEX_ALPHA, 0)))
+	if (!(pic = GL_LoadPicImage_MultiSource (crosshair_pathlist, namelist, "crosshair", TEX_ALPHA | TEX_NOTILE, 0)))
 	{
 		crosshairimage_loaded = false;
 		if (key_dest != key_menu)
@@ -987,7 +987,7 @@ void Draw_Init (void)
 		for (j = 0; j < 8*8; j++)
 			data24[j] = crosshairdata[i][j] ? MAKEGREY(crosshairdata[i][j]) : 0;
 
-		crosshairtextures[i] = GL_LoadTexture ("", 8, 8, (byte *)data24, TEX_ALPHA, 4);
+		crosshairtextures[i] = GL_LoadTexture ("", 8, 8, (byte *)data24, TEX_ALPHA | TEX_NOTILE, 4);
 		glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	}
@@ -1641,8 +1641,6 @@ void Draw_Crosshair (void)
 			ofsx *= /*(vid.width / 320) * */bound(0, crosshairsize.value, 20);
 			ofsy *= /*(vid.width / 320) * */bound(0, crosshairsize.value, 20);
 
-			glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-			glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 			glBegin (GL_QUADS);
 			glTexCoord2f (sl, tl);
 			glVertex2f (x - ofsx, y - ofsy);
