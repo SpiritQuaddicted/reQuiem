@@ -27,7 +27,7 @@ cvar_t	sv_edgefriction = {"edgefriction", "2"};
 cvar_t	sv_idealpitchscale = {"sv_idealpitchscale","0.8"};
 cvar_t	sv_maxspeed = {"sv_maxspeed", "320", CVAR_FLAG_SERVER};
 cvar_t	sv_accelerate = {"sv_accelerate", "10"};
-cvar_t	sv_aim = {"sv_aim", "0.93"};
+cvar_t	sv_aim = {"sv_aim", "1", CVAR_FLAG_ARCHIVE};
 cvar_t	sv_altnoclip = {"sv_altnoclip", "1", CVAR_FLAG_ARCHIVE};	// JDH: from Fitz
 
 static	vec3_t	forward, right, up;
