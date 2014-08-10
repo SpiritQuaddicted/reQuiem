@@ -270,6 +270,7 @@ extern	cvar_t	cl_pitchdriftspeed;
 extern	cvar_t	lookspring;
 extern	cvar_t	lookstrafe;
 extern	cvar_t	sensitivity;
+extern	cvar_t	m_look;
 
 extern	cvar_t	m_pitch;
 extern	cvar_t	m_yaw;
@@ -364,7 +365,8 @@ typedef struct
 	int		state;			// low bit is down state
 } kbutton_t;
 
-extern	kbutton_t	in_mlook, in_klook;
+extern 	qboolean 	mouselook;
+extern 	kbutton_t 	in_klook;
 extern 	kbutton_t 	in_strafe;
 extern 	kbutton_t 	in_speed;
 
@@ -387,6 +389,8 @@ void IN_CrouchUp (cmd_source_t src);
 void IN_infoPlaqueDown (cmd_source_t src);
 void IN_infoPlaqueUp (cmd_source_t src);
 #endif
+
+void RecalcMouselook (qboolean global_mlook);
 
 // cl_demo.c
 extern qboolean	cl_demoseek;

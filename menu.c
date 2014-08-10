@@ -580,6 +580,7 @@ menu_t menu_controls =
 		{                      "", NULL, NULL, M_ITEM_DISABLED},
 		{           "Mouse Speed", NULL, &sensitivity, M_ITEM_SLIDER},
 		{            "Always Run", NULL, &cl_forwardspeed},
+		{      "Always Mouselook", NULL, &m_look},
 		{          "Invert Mouse", NULL, &m_pitch},
 		{            "Lookspring", NULL, &lookspring},
 		{            "Lookstrafe", NULL, &lookstrafe},
@@ -2431,7 +2432,7 @@ void M_AdjustSliders (menu_t *menu, int dir, int key)
 		newval = bound (100, newval, 1000);
 		Cvar_SetValueDirect (var, newval);
 	}
-	else if ((var == &vid_vsync) || (var == &lookspring) || (var == &lookstrafe))
+	else if ((var == &vid_vsync) || (var == &lookspring) || (var == &lookstrafe) || (var == &m_look))
 	{
 		Cvar_SetValueDirect (var, !var->value);
 	}
@@ -2818,7 +2819,7 @@ void M_Controls_DrawVar (cvar_t *var, int y, qboolean selected)
 //		M_DrawCheckbox (M_VARLEFT, y, _windowed_mouse.value);
 		M_Print (M_VARLEFT, y, (!var->value ? "off" : (var->value == 1) ? "auto" : "on"));
 	}
-	else		// lookspring, lookstrafe
+	else		// lookspring, lookstrafe, always mouselook
 	{
 		M_DrawCheckbox (M_VARLEFT, y, var->value);
 	}
@@ -3527,7 +3528,7 @@ keycmd_t keycmds_game[] =
 	{"+jump", 			"Jump / Swim up"},
 	{"+strafe", 		"Strafe"},
 	{"centerview", 		"Center view"},
-	{"+mlook", 			"Mouse look"},
+	{"+mlook", 			"Mouselook on/off"},
 	{"+moveup",			"Swim up"},
 	{"+movedown",		"Swim down"},
 	{"+left", 			"Turn left"},
