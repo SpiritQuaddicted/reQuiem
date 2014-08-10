@@ -1588,7 +1588,7 @@ Draw_Crosshair		-- joe, from FuhQuake
 */
 void Draw_Crosshair (void)
 {
-	float		x, y, ofsx, ofsy, sh, th, sl, tl;
+	float		x, y, ofs, sh, th, sl, tl;
 	byte		col[4];
 	extern vrect_t	scr_vrect;
 
@@ -1622,8 +1622,6 @@ void Draw_Crosshair (void)
 			if (crosshairimage_loaded)
 			{
 				GL_Bind (crosshairpic.texnum);
-				ofsx = crosshairpic.width / 2.0;
-				ofsy = crosshairpic.height / 2.0;
 				sh = crosshairpic.sh;
 				sl = crosshairpic.sl;
 				th = crosshairpic.th;
@@ -1632,24 +1630,21 @@ void Draw_Crosshair (void)
 			else
 			{
 				GL_Bind (crosshairtextures[(int)crosshair.value-1]);
-				ofsx = 4.0;
-				ofsy = 4.0;
 				tl = sl = 0;
 				sh = th = 1;
 			}
 
-			ofsx *= /*(vid.width / 320) * */bound(0, crosshairsize.value, 20);
-			ofsy *= /*(vid.width / 320) * */bound(0, crosshairsize.value, 20);
+			ofs = 4.0 * bound(0, crosshairsize.value, 20);
 
 			glBegin (GL_QUADS);
 			glTexCoord2f (sl, tl);
-			glVertex2f (x - ofsx, y - ofsy);
+			glVertex2f (x - ofs, y - ofs);
 			glTexCoord2f (sh, tl);
-			glVertex2f (x + ofsx, y - ofsy);
+			glVertex2f (x + ofs, y - ofs);
 			glTexCoord2f (sh, th);
-			glVertex2f (x + ofsx, y + ofsy);
+			glVertex2f (x + ofs, y + ofs);
 			glTexCoord2f (sl, th);
-			glVertex2f (x - ofsx, y + ofsy);
+			glVertex2f (x - ofs, y + ofs);
 			glEnd ();
 		}
 		/*else
