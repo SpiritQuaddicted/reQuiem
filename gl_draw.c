@@ -814,7 +814,7 @@ qboolean OnChange_gl_crosshairimage (cvar_t *var, const char *string)
 	namelist[0] = string;
 	namelist[1] = NULL;
 
-	if (!(pic = GL_LoadPicImage_MultiSource (crosshair_pathlist, namelist, "crosshair", TEX_ALPHA, 0)))
+	if (!(pic = GL_LoadPicImage_MultiSource (crosshair_pathlist, namelist, "crosshair", TEX_ALPHA | TEX_NOTILE, 0)))
 	{
 		crosshairimage_loaded = false;
 		if (key_dest != key_menu)
@@ -987,7 +987,7 @@ void Draw_Init (void)
 		for (j = 0; j < 8*8; j++)
 			data24[j] = crosshairdata[i][j] ? MAKEGREY(crosshairdata[i][j]) : 0;
 
-		crosshairtextures[i] = GL_LoadTexture ("", 8, 8, (byte *)data24, TEX_ALPHA, 4);
+		crosshairtextures[i] = GL_LoadTexture ("", 8, 8, (byte *)data24, TEX_ALPHA | TEX_NOTILE, 4);
 		glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	}
@@ -1588,7 +1588,7 @@ Draw_Crosshair		-- joe, from FuhQuake
 */
 void Draw_Crosshair (void)
 {
-	float		x, y, ofs1, ofs2, sh, th, sl, tl;
+	float		x, y, ofs, sh, th, sl, tl;
 	byte		col[4];
 	extern vrect_t	scr_vrect;
 
@@ -1622,8 +1622,6 @@ void Draw_Crosshair (void)
 			if (crosshairimage_loaded)
 			{
 				GL_Bind (crosshairpic.texnum);
-				ofs1 = 4 - 4.0 / crosshairpic.width;
-				ofs2 = 4 + 4.0 / crosshairpic.width;
 				sh = crosshairpic.sh;
 				sl = crosshairpic.sl;
 				th = crosshairpic.th;
@@ -1632,24 +1630,21 @@ void Draw_Crosshair (void)
 			else
 			{
 				GL_Bind (crosshairtextures[(int)crosshair.value-1]);
-				ofs1 = 3.5;
-				ofs2 = 4.5;
 				tl = sl = 0;
 				sh = th = 1;
 			}
 
-			ofs1 *= /*(vid.width / 320) * */bound(0, crosshairsize.value, 20);
-			ofs2 *= /*(vid.width / 320) * */bound(0, crosshairsize.value, 20);
+			ofs = 4.0 * bound(0, crosshairsize.value, 20);
 
 			glBegin (GL_QUADS);
 			glTexCoord2f (sl, tl);
-			glVertex2f (x - ofs1, y - ofs1);
+			glVertex2f (x - ofs, y - ofs);
 			glTexCoord2f (sh, tl);
-			glVertex2f (x + ofs2, y - ofs1);
+			glVertex2f (x + ofs, y - ofs);
 			glTexCoord2f (sh, th);
-			glVertex2f (x + ofs2, y + ofs2);
+			glVertex2f (x + ofs, y + ofs);
 			glTexCoord2f (sl, th);
-			glVertex2f (x - ofs1, y + ofs2);
+			glVertex2f (x - ofs, y + ofs);
 			glEnd ();
 		}
 		/*else
