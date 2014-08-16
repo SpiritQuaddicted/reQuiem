@@ -42,7 +42,7 @@ cvar_t	cl_nolerp   = {"cl_nolerp",   "0"};
 cvar_t	lookspring  = {"lookspring",  "0", CVAR_FLAG_ARCHIVE};
 cvar_t	lookstrafe  = {"lookstrafe",  "0", CVAR_FLAG_ARCHIVE};
 cvar_t	sensitivity = {"sensitivity", "3", CVAR_FLAG_ARCHIVE};
-cvar_t	m_look      = {"m_look",      "0", CVAR_FLAG_ARCHIVE, OnChange_m_look};
+cvar_t	m_look      = {"m_look",      "1", CVAR_FLAG_ARCHIVE, OnChange_m_look};
 
 cvar_t	m_pitch     = {"m_pitch", "0.022", CVAR_FLAG_ARCHIVE};
 cvar_t	m_yaw       = {"m_yaw",   "0.022", CVAR_FLAG_ARCHIVE};
