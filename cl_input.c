@@ -130,9 +130,8 @@ void KeyUp (kbutton_t *b)
 
 void RecalcMouselook (qboolean global_mlook)
 {
-	qboolean keydown = ((in_mlook.state & 1) != 0);
 	qboolean old_mouselook = mouselook;
-	mouselook = (keydown != global_mlook);
+	mouselook = (global_mlook || ((in_mlook.state & 1) != 0));
 	// If disabling mouselook, and lookspring is enabled, handle that.
 	if (!mouselook && lookspring.value && old_mouselook)
 		V_StartPitchDrift ();

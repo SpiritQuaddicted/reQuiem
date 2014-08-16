@@ -3528,7 +3528,7 @@ keycmd_t keycmds_game[] =
 	{"+jump", 			"Jump / Swim up"},
 	{"+strafe", 		"Strafe"},
 	{"centerview", 		"Center view"},
-	{"+mlook", 			"Mouselook on/off"},
+	{"+mlook", 			"Mouse look"},
 	{"+moveup",			"Swim up"},
 	{"+movedown",		"Swim down"},
 	{"+left", 			"Turn left"},
