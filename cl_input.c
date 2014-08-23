@@ -54,6 +54,8 @@ kbutton_t	in_lookup, in_lookdown, in_moveleft, in_moveright;
 kbutton_t	in_strafe, in_speed, in_use, in_jump, in_attack;
 kbutton_t	in_up, in_down;
 
+qboolean		mouselook;
+
 int		in_impulse;
 
 
@@ -126,14 +128,26 @@ void KeyUp (kbutton_t *b)
 	b->state |= 4; 		// impulse up
 }
 
+void RecalcMouselook (qboolean global_mlook)
+{
+	qboolean old_mouselook = mouselook;
+	mouselook = (global_mlook || ((in_mlook.state & 1) != 0));
+	// If disabling mouselook, and lookspring is enabled, handle that.
+	if (!mouselook && lookspring.value && old_mouselook)
+		V_StartPitchDrift ();
+}
+
 void IN_KLookDown (cmd_source_t src)    {KeyDown(&in_klook);}
 void IN_KLookUp (cmd_source_t src)      {KeyUp(&in_klook);}
-void IN_MLookDown (cmd_source_t src)    {KeyDown(&in_mlook);}
+void IN_MLookDown (cmd_source_t src)
+{
+	KeyDown(&in_mlook);
+	RecalcMouselook (m_look.value != 0.0);
+}
 void IN_MLookUp (cmd_source_t src)
 {
 	KeyUp(&in_mlook);
-	if (!(in_mlook.state & 1) && lookspring.value)
-		V_StartPitchDrift ();
+	RecalcMouselook (m_look.value != 0.0);
 }
 void IN_UpDown(cmd_source_t src)        {KeyDown(&in_up);}
 void IN_UpUp(cmd_source_t src)          {KeyUp(&in_up);}

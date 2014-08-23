@@ -27,6 +27,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define CONNECT_DEBUG		// tracking down elusive bug in CL_EstablishConnection
 
+qboolean OnChange_m_look (cvar_t *var, const char *value)
+{
+	RecalcMouselook (Q_atof(value) != 0.0);
+	return false;		// allow change
+}
 
 // we need to declare some mouse variables here, because the menu system
 // references them even when on a unix system.
@@ -37,6 +42,7 @@ cvar_t	cl_nolerp   = {"cl_nolerp",   "0"};
 cvar_t	lookspring  = {"lookspring",  "0", CVAR_FLAG_ARCHIVE};
 cvar_t	lookstrafe  = {"lookstrafe",  "0", CVAR_FLAG_ARCHIVE};
 cvar_t	sensitivity = {"sensitivity", "3", CVAR_FLAG_ARCHIVE};
+cvar_t	m_look      = {"m_look",      "1", CVAR_FLAG_ARCHIVE, OnChange_m_look};
 
 cvar_t	m_pitch     = {"m_pitch", "0.022", CVAR_FLAG_ARCHIVE};
 cvar_t	m_yaw       = {"m_yaw",   "0.022", CVAR_FLAG_ARCHIVE};
@@ -1689,6 +1695,7 @@ void CL_Init (void)
 	Cvar_RegisterBool (&lookspring);
 	Cvar_RegisterBool (&lookstrafe);
 	Cvar_RegisterFloat (&sensitivity, 1, 11);
+	Cvar_RegisterBool (&m_look);
 
 	Cvar_RegisterFloat (&m_pitch, -1, 1);
 	Cvar_RegisterFloat (&m_yaw, -1, 1);		// JDH: is range correct??
@@ -1729,6 +1736,8 @@ void CL_Init (void)
 	Cmd_AddCommand ("stop", CL_Stop_f, 0);
 	Cmd_AddCommand ("playdemo", CL_PlayDemo_f, 0);
 	Cmd_AddCommand ("timedemo", CL_TimeDemo_f, 0);
+
+	RecalcMouselook (m_look.value != 0.0);
 }
 
 #endif		//#ifndef RQM_SV_ONLY
